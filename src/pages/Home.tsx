@@ -44,6 +44,8 @@ export default function Home() {
       { name: 'Spring League', href: '/spring-league' },
       { name: 'Summer League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
       { name: 'Fall League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
+      { name: 'Pro Camp 2026', href: '/#pro-camp-event' },
+      { name: 'ES National ID', href: '/#esid-event' },
       { name: 'Tournaments', href: '/tournaments' }
     ]},
     { name: 'Rules', icon: Book, dropdown: [
@@ -418,6 +420,48 @@ export default function Home() {
               <a href="https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0" target="_blank" rel="noreferrer" className="btn-primary bg-gradient-to-br from-red-600 to-red-800 shadow-red-200/50 btn-pulse-fall w-fit">
                 Register Now
               </a>
+           </motion.div>
+
+           {/* PRO CAMP 2026 */}
+           <motion.div 
+             id="pro-camp-event"
+             variants={revealVariants}
+             initial="hidden"
+             whileInView="visible"
+             viewport={{ once: true }}
+             className="glass-panel p-8 text-center bg-white flex flex-col items-center gap-6"
+           >
+              <div className="w-full">
+                <h3 className="text-[#C8102E] text-3xl font-black mb-1 uppercase">PRO CAMP 2026</h3>
+                <p className="font-bold text-lg text-[#111] mb-6 uppercase tracking-tighter">Elite Player Development</p>
+                <div className="block transform transition-transform hover:scale-[1.02] mb-6">
+                  <img src="https://images.pacificregionalsoccer.com/ESID%2BPROCAMP2026%20-%20PROCAMP.png" alt="PRO CAMP 2026" className="rounded-lg shadow-md max-w-full h-auto mx-auto" />
+                </div>
+              </div>
+              <div className="w-full flex flex-col gap-2">
+                <span className="text-sm font-bold text-gray-500 uppercase">Registration Coming Soon</span>
+              </div>
+           </motion.div>
+
+           {/* ES National Team Player ID */}
+           <motion.div 
+             id="esid-event"
+             variants={revealVariants}
+             initial="hidden"
+             whileInView="visible"
+             viewport={{ once: true }}
+             className="glass-panel p-8 text-center bg-white flex flex-col items-center gap-6"
+           >
+              <div className="w-full">
+                <h3 className="text-[#C8102E] text-3xl font-black mb-1 uppercase leading-tight">El Salvador National Team</h3>
+                <p className="font-bold text-lg text-[#111] mb-6 uppercase tracking-tighter">Player ID Event</p>
+                <div className="block transform transition-transform hover:scale-[1.02] mb-6">
+                  <img src="https://images.pacificregionalsoccer.com/ESID%2BPROCAMP2026%20-%201.png" alt="El Salvador ID Event" className="rounded-lg shadow-md max-w-full h-auto mx-auto" />
+                </div>
+              </div>
+              <div className="w-full flex flex-col gap-2">
+                <span className="text-sm font-bold text-gray-500 uppercase">Registration Coming Soon</span>
+              </div>
            </motion.div>
         </div>
 

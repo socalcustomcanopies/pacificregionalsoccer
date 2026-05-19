@@ -66,6 +66,8 @@ export default function Rules() {
       { name: 'Spring League', href: '/spring-league' },
       { name: 'Summer League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
       { name: 'Fall League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
+      { name: 'Pro Camp 2026', href: '/#pro-camp-event' },
+      { name: 'ES National ID', href: '/#esid-event' },
       { name: 'Tournaments', href: '/tournaments' }
     ]},
     { name: 'Rules', dropdown: [
