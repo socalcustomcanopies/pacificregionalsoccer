@@ -1,0 +1,8 @@
+{
+  "name": "Pacific Regional Soccer League",
+  "description": "L.A.'s #1 Youth Soccer League. Competitive youth club soccer serving Los Angeles, San Fernando Valley, Pasadena, Glendale, and San Gabriel Valley.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
