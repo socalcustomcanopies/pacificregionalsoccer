@@ -438,8 +438,15 @@ export default function Home() {
                   <img src="https://images.pacificregionalsoccer.com/ESID%2BPROCAMP2026%20-%20PROCAMP.png" alt="PRO CAMP 2026" className="rounded-lg shadow-md max-w-full h-auto mx-auto" />
                 </div>
               </div>
-              <div className="w-full flex flex-col gap-2">
-                <span className="text-sm font-bold text-gray-500 uppercase">Registration Coming Soon</span>
+              <div className="w-full flex flex-col items-center gap-2">
+                <a 
+                  href="https://pacificregional.leagueapps.com/camps/5003785-pro-camp" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="btn-primary bg-gradient-to-br from-red-600 to-red-800 shadow-red-200/50 btn-pulse-fall w-fit uppercase font-black"
+                >
+                  Register Now
+                </a>
               </div>
            </motion.div>
 
@@ -459,8 +466,15 @@ export default function Home() {
                   <img src="https://images.pacificregionalsoccer.com/ESID%2BPROCAMP2026%20-%201.png" alt="El Salvador ID Event" className="rounded-lg shadow-md max-w-full h-auto mx-auto" />
                 </div>
               </div>
-              <div className="w-full flex flex-col gap-2">
-                <span className="text-sm font-bold text-gray-500 uppercase">Registration Coming Soon</span>
+              <div className="w-full flex flex-col items-center gap-2">
+                <a 
+                  href="https://www.jotform.com/252498415438870" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="btn-primary bg-gradient-to-br from-blue-600 to-blue-800 shadow-blue-200/50 btn-pulse-fall w-fit uppercase font-black"
+                >
+                  Register Now
+                </a>
               </div>
            </motion.div>
         </div>
