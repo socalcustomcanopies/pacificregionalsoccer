@@ -35,7 +35,7 @@ export default function Home() {
       message: formData.message
     };
     
-    const webAppUrl = 'https://script.google.com/macros/s/AKfycbxOZcA4vkXxszDRTPrmg-3B3kXH8IAAcTYI1a-84y7Vtdf8kDSA2LtgS-oneD6okJsofA/exec';
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycb8jXboUkfAe3Givz-ldsqN0YPA_ydhPdIHUFTP5QrRtY5up3Ap1k7eic5A6TIdOXitqA/exec';
     
     try {
       await fetch(webAppUrl, {
