@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Instagram, 
@@ -21,6 +21,37 @@ export default function Home() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
+  
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormStatus('submitting');
+    
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      message: formData.message
+    };
+    
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbxOZcA4vkXxszDRTPrmg-3B3kXH8IAAcTYI1a-84y7Vtdf8kDSA2LtgS-oneD6okJsofA/exec';
+    
+    try {
+      await fetch(webAppUrl, {
+        method: 'POST',
+        mode: 'no-cors', // Avoids cross-origin issues with Apps Script
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      setFormStatus('success');
+      setFormData({ name: '', email: '', message: '' });
+      alert('Thank you! Your submission was saved.');
+    } catch (err) {
+      console.error('Error:', err);
+      setFormStatus('error');
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -577,44 +608,63 @@ export default function Home() {
              className="lg:col-span-7 glass-panel p-10 bg-white"
            >
               <h2 className="text-2xl font-black uppercase text-[#111] mb-8">Contact Us</h2>
-              <form action="https://formsubmit.co/workorders@hpo.center" method="POST" className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <input type="hidden" name="_cc" value="pacificregionalsoccerleague@gmail.com" />
-                <input type="hidden" name="_subject" value="New Contact Form Submission - PRSL" />
-                <input type="hidden" name="_next" value={`${typeof window !== 'undefined' ? window.location.origin : ''}/success`} />
-                
-                <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-black uppercase tracking-wider text-gray-500">First Name *</label>
-                    <input type="text" name="First Name" required className="bg-gray-50 border border-gray-200 p-3 rounded focus:ring-2 focus:ring-[#C8102E] transition-all outline-none" />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-black uppercase tracking-wider text-gray-500">Last Name *</label>
-                    <input type="text" name="Last Name" required className="bg-gray-50 border border-gray-200 p-3 rounded focus:ring-2 focus:ring-[#C8102E] transition-all outline-none" />
-                  </div>
+              <form id="contactForm" onSubmit={handleFormSubmit} className="flex flex-col gap-5">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-black uppercase tracking-wider text-gray-500">Name *</label>
+                  <input 
+                    type="text" 
+                    id="name" 
+                    required 
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="bg-gray-50 border border-gray-200 p-3 rounded focus:ring-2 focus:ring-[#C8102E] transition-all outline-none" 
+                  />
                 </div>
 
-                <div className="sm:col-span-2 flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-black uppercase tracking-wider text-gray-500">Email *</label>
-                  <input type="email" name="Email Address" required className="bg-gray-50 border border-gray-200 p-3 rounded focus:ring-2 focus:ring-[#C8102E] transition-all outline-none" />
+                  <input 
+                    type="email" 
+                    id="email" 
+                    required 
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="bg-gray-50 border border-gray-200 p-3 rounded focus:ring-2 focus:ring-[#C8102E] transition-all outline-none" 
+                  />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-gray-500">Club / Age *</label>
-                  <input type="text" name="Club Name & Age Group" required className="bg-gray-50 border border-gray-200 p-3 rounded focus:ring-2 focus:ring-[#C8102E] transition-all outline-none" />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-gray-500">Position *</label>
-                  <input type="text" name="Position" required className="bg-gray-50 border border-gray-200 p-3 rounded focus:ring-2 focus:ring-[#C8102E] transition-all outline-none" />
-                </div>
-
-                <div className="sm:col-span-2 flex flex-col gap-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-gray-500">Write a Message</label>
-                  <textarea name="Message" rows={4} className="bg-gray-50 border border-gray-200 p-3 rounded focus:ring-2 focus:ring-[#C8102E] transition-all outline-none resize-none"></textarea>
+                  <label className="text-xs font-black uppercase tracking-wider text-gray-500">Write a Message *</label>
+                  <textarea 
+                    id="message" 
+                    required
+                    rows={4} 
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="bg-gray-50 border border-gray-200 p-3 rounded focus:ring-2 focus:ring-[#C8102E] transition-all outline-none resize-none"
+                  ></textarea>
                 </div>
 
-                <div className="sm:col-span-2">
-                  <button type="submit" className="btn-primary w-full">Submit Message</button>
+                <div>
+                  <button 
+                    type="submit" 
+                    disabled={formStatus === 'submitting'}
+                    className={`btn-primary w-full ${formStatus === 'submitting' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    {formStatus === 'submitting' ? 'Submitting...' : 'Submit Message'}
+                  </button>
                 </div>
+                
+                {formStatus === 'success' && (
+                  <div className="text-green-600 font-bold text-center mt-2">
+                    Message saved successfully!
+                  </div>
+                )}
+                {formStatus === 'error' && (
+                  <div className="text-red-500 font-bold text-center mt-2">
+                    Something went wrong. Please try again.
+                  </div>
+                )}
               </form>
            </motion.div>
         </div>
