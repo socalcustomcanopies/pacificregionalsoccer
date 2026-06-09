@@ -68,11 +68,10 @@ export default function Home() {
 
   const navLinks = [
     { name: 'Home', href: '/', icon: LayoutGrid },
-    { name: "SPRING 26'", icon: Calendar, dropdown: [
-      { name: 'Schedule', href: 'https://soccer.sincsports.com/schedule.aspx?tid=DSPCH&tab=3&sub=0' },
+    { name: "SUMMER 26'", icon: Calendar, dropdown: [
+      { name: 'Registration', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
     ]},
     { name: 'Events', href: '/#events', icon: Calendar, dropdown: [
-      { name: 'Spring League', href: '/spring-league' },
       { name: 'Summer League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
       { name: 'Fall League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
       { name: 'Pro Camp 2026', href: '/#pro-camp-event' },
@@ -176,8 +175,8 @@ export default function Home() {
             </li>
           ))}
           <li>
-            <a href="https://soccer.sincsports.com/schedule.aspx?tid=DSPCH&tab=3&sub=0" target="_blank" rel="noreferrer" className="bg-[#C8102E] text-white px-5 py-2 rounded-md font-bold text-[0.85rem] uppercase hover:bg-[#a00c24] transition-all">
-              Schedule
+            <a href="https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0" target="_blank" rel="noreferrer" className="bg-[#C8102E] text-white px-5 py-2 rounded-md font-bold text-[0.85rem] uppercase hover:bg-[#a00c24] transition-all">
+              Register Now
             </a>
           </li>
         </ul>
@@ -284,8 +283,7 @@ export default function Home() {
             </p>
             
             <div className="flex flex-wrap gap-4 mb-5">
-              <Link to="/spring-league" className="btn-outline">Spring Registration</Link>
-              <a href="https://soccer.sincsports.com/schedule.aspx?tid=DSPCH&tab=3&sub=0" target="_blank" rel="noreferrer" className="btn-outline">Schedule</a>
+              <a href="https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0" target="_blank" rel="noreferrer" className="btn-outline">Summer Registration</a>
               <a href="#events" className="btn-outline">View Events</a>
             </div>
             <div className="flex flex-wrap gap-4">
@@ -300,25 +298,12 @@ export default function Home() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="glass-panel group aspect-[4/3] lg:flex-1 bg-white"
+              className="glass-panel group aspect-[4/3] lg:h-full bg-white flex items-center justify-center p-5 animate-fade-in"
             >
               <img 
-                src="https://images.pacificregionalsoccer.com/PacificRegionSL2025Art%20(1).avif" 
-                alt="PRSL 2025 Art" 
-                className="w-full h-full object-contain p-5 transition-transform duration-700 group-hover:scale-105" 
-              />
-            </motion.div>
-            <motion.div 
-              variants={revealVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="glass-panel group aspect-[4/3] lg:flex-1 bg-white"
-            >
-              <img 
-                src="https://images.pacificregionalsoccer.com/CalSouth_Sanctioned_League_25_26%20LOGO.avif" 
-                alt="CalSouth Sanctioned League" 
-                className="w-full h-full object-contain p-5 transition-transform duration-700 group-hover:scale-105" 
+                src="https://images.pacificregionalsoccer.com/26-27%20League%20LOGO.png" 
+                alt="CalSouth Sanctioned League 2026-2027" 
+                className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105" 
               />
             </motion.div>
           </div>

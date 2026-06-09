@@ -15,7 +15,8 @@ import {
   UserCheck,
   Table,
   FileText,
-  X
+  X,
+  MessageSquare
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -38,7 +39,7 @@ export default function Rules() {
 
       // Simple active section detection
       let currentSection = 'mission';
-      const sectionIds = ['mission', 'registration', 'rules-of-play', 'scoring', 'ref-fees', 'fees', 'ref-authority', 'penalties-matrix', 'policy-en', 'policy-es', 'policy-ar'];
+      const sectionIds = ['mission', 'registration', 'rules-of-play', 'scoring', 'ref-fees', 'fees', 'ref-authority', 'comm-policy', 'penalties-matrix', 'policy-en', 'policy-es', 'policy-ar'];
       
       for (const id of sectionIds) {
         const el = document.getElementById(id);
@@ -59,11 +60,10 @@ export default function Rules() {
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: "SPRING 26'", dropdown: [
-      { name: 'Schedule', href: 'https://soccer.sincsports.com/schedule.aspx?tid=DSPCH&tab=3&sub=0' },
+    { name: "SUMMER 26'", dropdown: [
+      { name: 'Registration', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
     ]},
     { name: 'Events', href: '/#events', dropdown: [
-      { name: 'Spring League', href: '/spring-league' },
       { name: 'Summer League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
       { name: 'Fall League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
       { name: 'Pro Camp 2026', href: '/#pro-camp-event' },
@@ -86,6 +86,7 @@ export default function Rules() {
     { id: 'ref-fees', name: 'Referee Fee Schedule', icon: CreditCard },
     { id: 'fees', name: 'Cancellations & Forfeits', icon: CreditCard },
     { id: 'ref-authority', name: 'Referee Authority', icon: UserCheck },
+    { id: 'comm-policy', name: 'Communication Policy', icon: MessageSquare },
     { id: 'penalties-matrix', name: 'Penalties Matrix', icon: Table },
     { id: 'policy-en', name: 'Abuse Policy (English)', icon: FileText },
     { id: 'policy-es', name: 'Abuse Policy (Spanish)', icon: FileText },
@@ -627,6 +628,29 @@ export default function Rules() {
                 <div className="p-4 bg-white/5 border border-white/10 rounded italic text-xs text-gray-400 leading-relaxed">
                    <strong>Coach Suspensions:</strong> During game suspension(s), there can be NO contact between the team and the coach. The coach must be out of sight and sound of the field.
                 </div>
+             </div>
+          </section>
+
+          <section id="comm-policy" className="glass-panel p-8 lg:p-12 border border-white/10 bg-[#0f0f0f]/95 scroll-mt-36">
+             <h2 className="text-2xl font-black uppercase mb-8 flex items-center gap-3"><MessageSquare className="text-[#C8102E]" /> League / Club Communication Policy</h2>
+             
+             <div className="space-y-6 text-gray-400">
+                <p className="leading-relaxed text-sm">
+                   All official league communication will be directed to designated Club Officials and/or Team Contacts listed in the SINC Sports system. It is the responsibility of each club to ensure that all required contact information is current and accurate at all times.
+                </p>
+                <p className="leading-relaxed text-sm">
+                   To maintain an organized and efficient communication process, PRSL staff will communicate directly with designated Club Officials regarding league matters, schedules, rules, disciplinary issues, and administrative concerns.
+                </p>
+                
+                <div className="bg-red-600/10 border-l-4 border-[#C8102E] p-6 rounded-r-lg my-6">
+                   <p className="text-sm text-gray-300 leading-relaxed font-semibold">
+                      Emails, phone calls, or other communications sent directly to PRSL staff by parents, players, spectators, or other team representatives may not receive a response. Clubs are responsible for informing their members and staff that all league-related concerns, questions, or requests must first be directed through their designated Club Official.
+                   </p>
+                </div>
+                
+                <p className="leading-relaxed text-sm">
+                   If further assistance is required, the designated Club Official may contact PRSL staff on behalf of the club or team. PRSL reserves the right to require all communications to follow this chain of communication.
+                </p>
              </div>
           </section>
 

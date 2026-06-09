@@ -38,11 +38,10 @@ export default function SpringLeague() {
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: "SPRING 26'", dropdown: [
-      { name: 'Schedule', href: 'https://soccer.sincsports.com/schedule.aspx?tid=DSPCH&tab=3&sub=0' },
+    { name: "SUMMER 26'", dropdown: [
+      { name: 'Registration', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
     ]},
     { name: 'Events', href: '/#events', dropdown: [
-      { name: 'Spring League', href: '/spring-league' },
       { name: 'Summer League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
       { name: 'Fall League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
       { name: 'Pro Camp 2026', href: '/#pro-camp-event' },
