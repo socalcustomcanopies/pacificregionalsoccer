@@ -34,6 +34,7 @@ export default function Tournaments() {
     { name: 'Home', href: '/' },
     { name: "SUMMER 26'", dropdown: [
       { name: 'Registration', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
+      { name: 'Summer Schedule', href: 'https://soccer.sincsports.com/schedule.aspx?tid=SUMCIR&tab=3&sub=0', highlight: true },
     ]},
     { name: 'Events', href: '/#events', dropdown: [
       { name: 'Summer League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
@@ -115,7 +116,11 @@ export default function Tournaments() {
                         href={sub.href}
                         target={sub.href.startsWith('http') ? "_blank" : undefined}
                         rel={sub.href.startsWith('http') ? "noreferrer" : undefined}
-                        className="block px-5 py-3 text-gray-300 no-underline text-[0.85rem] font-semibold border-b border-white/5 hover:bg-white/5 hover:text-[#C8102E] hover:pl-7 transition-all"
+                        className={
+                          sub.highlight 
+                            ? "block px-5 py-3 bg-[#C8102E] text-white font-black text-center no-underline text-[0.85rem] hover:bg-[#a00c24] transition-all"
+                            : "block px-5 py-3 text-gray-300 no-underline text-[0.85rem] font-semibold border-b border-white/5 hover:bg-white/5 hover:text-[#C8102E] hover:pl-7 transition-all"
+                        }
                       >
                         {sub.name}
                       </a>
@@ -123,7 +128,11 @@ export default function Tournaments() {
                       <Link 
                         key={sub.name}
                         to={sub.href}
-                        className="block px-5 py-3 text-gray-300 no-underline text-[0.85rem] font-semibold border-b border-white/5 hover:bg-white/5 hover:text-[#C8102E] hover:pl-7 transition-all"
+                        className={
+                          sub.highlight 
+                            ? "block px-5 py-3 bg-[#C8102E] text-white font-black text-center no-underline text-[0.85rem] hover:bg-[#a00c24] transition-all"
+                            : "block px-5 py-3 text-gray-300 no-underline text-[0.85rem] font-semibold border-b border-white/5 hover:bg-white/5 hover:text-[#C8102E] hover:pl-7 transition-all"
+                        }
                       >
                         {sub.name}
                       </Link>
@@ -169,7 +178,11 @@ export default function Tournaments() {
                             target={sub.href.startsWith('http') ? "_blank" : undefined}
                             rel={sub.href.startsWith('http') ? "noreferrer" : undefined}
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="text-lg font-bold text-white uppercase py-3 hover:text-[#C8102E]"
+                            className={
+                              sub.highlight
+                                ? "text-lg font-black text-white bg-[#C8102E] py-3 px-6 rounded-md my-2 block shadow-md hover:bg-[#a00c24] transition-all"
+                                : "text-lg font-bold text-white uppercase py-3 hover:text-[#C8102E]"
+                            }
                           >
                             {sub.name}
                           </a>
@@ -178,7 +191,11 @@ export default function Tournaments() {
                             key={sub.name} 
                             to={sub.href} 
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="text-lg font-bold text-white uppercase py-3 hover:text-[#C8102E]"
+                            className={
+                              sub.highlight
+                                ? "text-lg font-black text-white bg-[#C8102E] py-3 px-6 rounded-md my-2 block shadow-md hover:bg-[#a00c24] transition-all"
+                                : "text-lg font-bold text-white uppercase py-3 hover:text-[#C8102E]"
+                            }
                           >
                             {sub.name}
                           </Link>

@@ -70,6 +70,7 @@ export default function Home() {
     { name: 'Home', href: '/', icon: LayoutGrid },
     { name: "SUMMER 26'", icon: Calendar, dropdown: [
       { name: 'Registration', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
+      { name: 'Summer Schedule', href: 'https://soccer.sincsports.com/schedule.aspx?tid=SUMCIR&tab=3&sub=0', highlight: true },
     ]},
     { name: 'Events', href: '/#events', icon: Calendar, dropdown: [
       { name: 'Summer League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
@@ -156,7 +157,11 @@ export default function Home() {
                             href={sub.href}
                             target={sub.href.startsWith('http') ? "_blank" : undefined}
                             rel={sub.href.startsWith('http') ? "noreferrer" : undefined}
-                            className="block px-5 py-3 text-[#1a1a1a] no-underline text-[0.85rem] font-semibold border-b border-black/5 hover:bg-gray-50 hover:text-[#C8102E] hover:pl-7 transition-all"
+                            className={
+                              sub.highlight 
+                                ? "block px-5 py-3 bg-[#C8102E] text-white font-black text-center no-underline text-[0.85rem] hover:bg-[#a00c24] transition-all"
+                                : "block px-5 py-3 text-[#1a1a1a] no-underline text-[0.85rem] font-semibold border-b border-black/5 hover:bg-gray-50 hover:text-[#C8102E] hover:pl-7 transition-all"
+                            }
                           >
                             {sub.name}
                           </a>
@@ -164,7 +169,11 @@ export default function Home() {
                           <Link 
                             key={sub.name}
                             to={sub.href}
-                            className="block px-5 py-3 text-[#1a1a1a] no-underline text-[0.85rem] font-semibold border-b border-black/5 hover:bg-gray-50 hover:text-[#C8102E] hover:pl-7 transition-all"
+                            className={
+                              sub.highlight 
+                                ? "block px-5 py-3 bg-[#C8102E] text-white font-black text-center no-underline text-[0.85rem] hover:bg-[#a00c24] transition-all"
+                                : "block px-5 py-3 text-[#1a1a1a] no-underline text-[0.85rem] font-semibold border-b border-black/5 hover:bg-gray-50 hover:text-[#C8102E] hover:pl-7 transition-all"
+                            }
                           >
                             {sub.name}
                           </Link>
@@ -215,7 +224,11 @@ export default function Home() {
                             target={sub.href.startsWith('http') ? "_blank" : undefined}
                             rel={sub.href.startsWith('http') ? "noreferrer" : undefined}
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="text-lg font-bold text-[#1a1a1a] uppercase py-3 hover:text-[#C8102E]"
+                            className={
+                              sub.highlight
+                                ? "text-lg font-black text-white bg-[#C8102E] py-3 px-6 rounded-md my-2 block shadow-md hover:bg-[#a00c24] transition-all"
+                                : "text-lg font-bold text-[#1a1a1a] uppercase py-3 hover:text-[#C8102E]"
+                            }
                           >
                             {sub.name}
                           </a>
@@ -224,7 +237,11 @@ export default function Home() {
                             key={sub.name} 
                             to={sub.href} 
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="text-lg font-bold text-[#1a1a1a] uppercase py-3 hover:text-[#C8102E]"
+                            className={
+                              sub.highlight
+                                ? "text-lg font-black text-white bg-[#C8102E] py-3 px-6 rounded-md my-2 block shadow-md hover:bg-[#a00c24] transition-all"
+                                : "text-lg font-bold text-[#1a1a1a] uppercase py-3 hover:text-[#C8102E]"
+                            }
                           >
                             {sub.name}
                           </Link>
@@ -282,13 +299,39 @@ export default function Home() {
               <span className="inline-block lg:inline">Youth Soccer League</span>
             </p>
             
-            <div className="flex flex-wrap gap-4 mb-5">
-              <a href="https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0" target="_blank" rel="noreferrer" className="btn-outline">Summer Registration</a>
-              <a href="#events" className="btn-outline">View Events</a>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5 max-w-lg items-stretch">
+              <a 
+                href="https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0" 
+                target="_blank" 
+                rel="noreferrer" 
+                className="btn-outline h-full flex items-center justify-center text-center py-4"
+              >
+                Summer Registration
+              </a>
+              <div className="flex flex-col gap-3">
+                <a 
+                  href="https://soccer.sincsports.com/schedule.aspx?tid=SUMCIR&tab=3&sub=0" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="btn-primary bg-[#C8102E] hover:bg-[#a00c24] shadow-[0_10px_20px_rgba(200,16,46,0.3)] text-center py-4"
+                >
+                  Summer Schedule
+                </a>
+                <a 
+                  href="#events" 
+                  className="btn-outline text-center py-4"
+                >
+                  View Events
+                </a>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-4">
-              <a href="#summer-event" className="btn-primary bg-gradient-to-br from-orange-400 to-orange-600 shadow-orange-300/30 btn-pulse-summer">Summer</a>
-              <a href="#fall-event" className="btn-primary bg-gradient-to-br from-red-600 to-red-800 shadow-red-300/30 btn-pulse-fall">Fall</a>
+            <div className="grid grid-cols-2 gap-4 max-w-lg mb-8">
+              <a href="#summer-event" className="btn-primary bg-gradient-to-br from-orange-400 to-orange-600 shadow-orange-300/30 btn-pulse-summer text-center py-4 justify-center">
+                Summer
+              </a>
+              <a href="#fall-event" className="btn-primary bg-gradient-to-br from-red-600 to-red-800 shadow-red-300/30 btn-pulse-fall text-center py-4 justify-center">
+                Fall
+              </a>
             </div>
           </motion.div>
 
@@ -416,9 +459,14 @@ export default function Home() {
                   </a>
                 </div>
               </div>
-              <a href="https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0" target="_blank" rel="noreferrer" className="btn-primary bg-gradient-to-br from-orange-400 to-orange-600 shadow-orange-200/50 btn-pulse-summer w-fit">
-                Register Now
-              </a>
+              <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                <a href="https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0" target="_blank" rel="noreferrer" className="btn-primary bg-gradient-to-br from-orange-400 to-orange-600 shadow-orange-200/50 btn-pulse-summer w-full sm:w-auto text-center">
+                  Register Now
+                </a>
+                <a href="https://soccer.sincsports.com/schedule.aspx?tid=SUMCIR&tab=3&sub=0" target="_blank" rel="noreferrer" className="btn-primary bg-[#C8102E] hover:bg-[#a00c24] w-full sm:w-auto text-center shadow-[0_10px_20px_rgba(200,16,46,0.3)]">
+                  Summer Schedule
+                </a>
+              </div>
            </motion.div>
 
            {/* Fall */}
