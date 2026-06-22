@@ -75,7 +75,6 @@ export default function Home() {
     { name: 'Events', href: '/#events', icon: Calendar, dropdown: [
       { name: 'Summer League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
       { name: 'Fall League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
-      { name: 'Pro Camp 2026', href: '/#pro-camp-event' },
       { name: 'ES National ID', href: '/#esid-event' },
       { name: 'Tournaments', href: '/tournaments' }
     ]},
@@ -438,7 +437,7 @@ export default function Home() {
           <div className="w-16 h-1 bg-[#C8102E] mx-auto rounded-full" />
         </div>
 
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
            {/* Summer */}
            <motion.div 
              id="summer-event"
@@ -492,38 +491,6 @@ export default function Home() {
               <a href="https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0" target="_blank" rel="noreferrer" className="btn-primary bg-gradient-to-br from-red-600 to-red-800 shadow-red-200/50 btn-pulse-fall w-fit">
                 Register Now
               </a>
-           </motion.div>
-
-           {/* PRO CAMP 2026 */}
-           <motion.div 
-             id="pro-camp-event"
-             variants={revealVariants}
-             initial="hidden"
-             whileInView="visible"
-             viewport={{ once: true }}
-             className="glass-panel p-8 text-center bg-white flex flex-col items-center gap-6 h-full"
-           >
-              <div className="w-full flex-1 flex flex-col">
-                <div className="min-h-[120px] flex flex-col justify-center">
-                  <h3 className="text-[#C8102E] text-3xl font-black mb-1 uppercase">PRO CAMP 2026</h3>
-                  <p className="font-bold text-lg text-[#111] mb-6 uppercase tracking-tighter">Elite Player Development</p>
-                </div>
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="block transform transition-transform hover:scale-[1.02] mb-6">
-                    <img src="https://images.pacificregionalsoccer.com/ESID%2BPROCAMP2026%20-%20PROCAMP.png" alt="PRO CAMP 2026" className="rounded-lg shadow-md max-w-full h-auto mx-auto" />
-                  </div>
-                </div>
-              </div>
-              <div className="w-full flex flex-col items-center gap-2">
-                <a 
-                  href="https://pacificregional.leagueapps.com/camps/5003785-pro-camp" 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="btn-primary bg-gradient-to-br from-red-600 to-red-800 shadow-red-200/50 btn-pulse-fall w-fit uppercase font-black"
-                >
-                  Register Now
-                </a>
-              </div>
            </motion.div>
 
            {/* ES National Team Player ID */}
