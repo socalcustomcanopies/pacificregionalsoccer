@@ -68,6 +68,7 @@ export default function Rules() {
       { name: 'Summer League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
       { name: 'Fall League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
       { name: 'ES National ID', href: '/#esid-event' },
+      { name: 'Scrimmage Request', href: 'https://www.Socalsoccerscrimmages.com' },
       { name: 'Tournaments', href: '/tournaments' }
     ]},
     { name: 'Rules', dropdown: [
