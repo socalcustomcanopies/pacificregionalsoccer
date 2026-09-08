@@ -69,8 +69,8 @@ export default function Home() {
   const navLinks = [
     { name: 'Home', href: '/', icon: LayoutGrid },
     { name: "FALL 2026", icon: Calendar, dropdown: [
-      { name: 'Registration', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0', highlight: true },
-      { name: 'Fall Schedule', href: 'https://soccer.sincsports.com/schedule.aspx?tid=PACRSL&tab=3&sub=0' },
+      { name: 'Registration', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
+      { name: 'Fall Schedule', href: 'https://soccer.sincsports.com/schedule.aspx?tid=PACRSL&tab=3&sub=0', highlight: true },
     ]},
     { name: 'Events', href: '/#events', icon: Calendar, dropdown: [
       { name: 'Fall League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
@@ -186,8 +186,8 @@ export default function Home() {
             </li>
           ))}
           <li>
-            <a href="https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0" target="_blank" rel="noreferrer" className="bg-[#C8102E] text-white px-5 py-2 rounded-md font-bold text-[0.85rem] uppercase hover:bg-[#a00c24] transition-all">
-              Register Now
+            <a href="https://soccer.sincsports.com/schedule.aspx?tid=PACRSL&tab=3&sub=0" target="_blank" rel="noreferrer" className="bg-[#C8102E] text-white px-5 py-2 rounded-md font-bold text-[0.85rem] uppercase hover:bg-[#a00c24] transition-all">
+              Fall Schedule
             </a>
           </li>
         </ul>
