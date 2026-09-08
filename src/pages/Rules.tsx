@@ -60,16 +60,18 @@ export default function Rules() {
 
   const navLinks = [
     { name: 'Home', href: '/' },
-    { name: "SUMMER 26'", dropdown: [
-      { name: 'Registration', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
-      { name: 'Summer Schedule', href: 'https://soccer.sincsports.com/schedule.aspx?tid=SUMCIR&tab=3&sub=0', highlight: true },
+    { name: "FALL 2026", dropdown: [
+      { name: 'Registration', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0', highlight: true },
+      { name: 'Fall Schedule', href: 'https://soccer.sincsports.com/schedule.aspx?tid=PACRSL&tab=3&sub=0' },
     ]},
     { name: 'Events', href: '/#events', dropdown: [
-      { name: 'Summer League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
       { name: 'Fall League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
-      { name: 'ES National ID', href: '/#esid-event' },
       { name: 'Scrimmage Request', href: 'https://www.Socalsoccerscrimmages.com' },
       { name: 'Tournaments', href: '/tournaments' }
+    ]},
+    { name: 'Coaches Resources', dropdown: [
+      { name: 'Coaches Requirements', href: 'https://calsouth.com/wp-content/uploads/2024/05/Coaching-License-Checklist_IP-5_2024.pdf' },
+      { name: 'Licensing & Education', href: '/#education' }
     ]},
     { name: 'Rules', dropdown: [
       { name: 'League Rules', href: '/rules' },

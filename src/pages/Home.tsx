@@ -68,16 +68,18 @@ export default function Home() {
 
   const navLinks = [
     { name: 'Home', href: '/', icon: LayoutGrid },
-    { name: "SUMMER 26'", icon: Calendar, dropdown: [
-      { name: 'Registration', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
-      { name: 'Summer Schedule', href: 'https://soccer.sincsports.com/schedule.aspx?tid=SUMCIR&tab=3&sub=0', highlight: true },
+    { name: "FALL 2026", icon: Calendar, dropdown: [
+      { name: 'Registration', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0', highlight: true },
+      { name: 'Fall Schedule', href: 'https://soccer.sincsports.com/schedule.aspx?tid=PACRSL&tab=3&sub=0' },
     ]},
     { name: 'Events', href: '/#events', icon: Calendar, dropdown: [
-      { name: 'Summer League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0' },
       { name: 'Fall League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
-      { name: 'ES National ID', href: '/#esid-event' },
       { name: 'Scrimmage Request', href: 'https://www.Socalsoccerscrimmages.com' },
       { name: 'Tournaments', href: '/tournaments' }
+    ]},
+    { name: 'Coaches Resources', icon: GraduationCap, dropdown: [
+      { name: 'Coaches Requirements', href: 'https://calsouth.com/wp-content/uploads/2024/05/Coaching-License-Checklist_IP-5_2024.pdf' },
+      { name: 'Licensing & Education', href: '/#education' }
     ]},
     { name: 'Rules', icon: Book, dropdown: [
       { name: 'League Rules', href: '/rules' },
@@ -184,7 +186,7 @@ export default function Home() {
             </li>
           ))}
           <li>
-            <a href="https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0" target="_blank" rel="noreferrer" className="bg-[#C8102E] text-white px-5 py-2 rounded-md font-bold text-[0.85rem] uppercase hover:bg-[#a00c24] transition-all">
+            <a href="https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0" target="_blank" rel="noreferrer" className="bg-[#C8102E] text-white px-5 py-2 rounded-md font-bold text-[0.85rem] uppercase hover:bg-[#a00c24] transition-all">
               Register Now
             </a>
           </li>
@@ -299,39 +301,31 @@ export default function Home() {
               <span className="inline-block lg:inline">Youth Soccer League</span>
             </p>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5 max-w-lg items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 max-w-lg items-stretch">
               <a 
-                href="https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0" 
+                href="https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0" 
                 target="_blank" 
                 rel="noreferrer" 
-                className="btn-outline h-full flex items-center justify-center text-center py-4"
+                className="btn-primary bg-[#C8102E] hover:bg-[#a00c24] shadow-[0_10px_20px_rgba(200,16,46,0.3)] h-full flex items-center justify-center text-center py-4 text-lg font-black uppercase"
               >
-                Summer Registration
+                Fall Registration
               </a>
               <div className="flex flex-col gap-3">
                 <a 
-                  href="https://soccer.sincsports.com/schedule.aspx?tid=SUMCIR&tab=3&sub=0" 
+                  href="https://soccer.sincsports.com/schedule.aspx?tid=PACRSL&tab=3&sub=0" 
                   target="_blank" 
                   rel="noreferrer" 
-                  className="btn-primary bg-[#C8102E] hover:bg-[#a00c24] shadow-[0_10px_20px_rgba(200,16,46,0.3)] text-center py-4"
+                  className="btn-outline text-center py-3.5 font-bold"
                 >
-                  Summer Schedule
+                  Fall Schedule
                 </a>
                 <a 
                   href="#events" 
-                  className="btn-outline text-center py-4"
+                  className="btn-outline text-center py-3.5 font-bold"
                 >
                   View Events
                 </a>
               </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4 max-w-lg mb-8">
-              <a href="#summer-event" className="btn-primary bg-gradient-to-br from-orange-400 to-orange-600 shadow-orange-300/30 btn-pulse-summer text-center py-4 justify-center">
-                Summer
-              </a>
-              <a href="#fall-event" className="btn-primary bg-gradient-to-br from-red-600 to-red-800 shadow-red-300/30 btn-pulse-fall text-center py-4 justify-center">
-                Fall
-              </a>
             </div>
           </motion.div>
 
@@ -438,37 +432,7 @@ export default function Home() {
           <div className="w-16 h-1 bg-[#C8102E] mx-auto rounded-full" />
         </div>
 
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-           {/* Summer */}
-           <motion.div 
-             id="summer-event"
-             variants={revealVariants}
-             initial="hidden"
-             whileInView="visible"
-             viewport={{ once: true }}
-             className="glass-panel p-8 text-center bg-white flex flex-col items-center gap-6 h-full"
-           >
-              <div className="w-full flex-1 flex flex-col">
-                <div className="min-h-[120px] flex flex-col justify-center">
-                  <h3 className="text-[#C8102E] text-3xl font-black mb-2 uppercase">Summer League 2026</h3>
-                  <p className="font-bold text-lg text-[#111] mb-6">Now accepting applications.</p>
-                </div>
-                <div className="flex-1 flex items-center justify-center">
-                  <a href="https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0" target="_blank" rel="noreferrer" className="block transform transition-transform hover:scale-[1.02] mb-6">
-                    <img src="https://images.pacificregionalsoccer.com/unnamed%20(3).png" alt="Summer League" className="rounded-lg shadow-md max-w-full h-auto mx-auto" />
-                  </a>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
-                <a href="https://soccer.sincsports.com/register/start.aspx?tid=SUMCIR&tab=2&sub=0" target="_blank" rel="noreferrer" className="btn-primary bg-gradient-to-br from-orange-400 to-orange-600 shadow-orange-200/50 btn-pulse-summer w-full sm:w-auto text-center">
-                  Register Now
-                </a>
-                <a href="https://soccer.sincsports.com/schedule.aspx?tid=SUMCIR&tab=3&sub=0" target="_blank" rel="noreferrer" className="btn-primary bg-[#C8102E] hover:bg-[#a00c24] w-full sm:w-auto text-center shadow-[0_10px_20px_rgba(200,16,46,0.3)]">
-                  Summer Schedule
-                </a>
-              </div>
-           </motion.div>
-
+        <div className="max-w-xl mx-auto">
            {/* Fall */}
            <motion.div 
              id="fall-event"
@@ -492,38 +456,6 @@ export default function Home() {
               <a href="https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0" target="_blank" rel="noreferrer" className="btn-primary bg-gradient-to-br from-red-600 to-red-800 shadow-red-200/50 btn-pulse-fall w-fit">
                 Register Now
               </a>
-           </motion.div>
-
-           {/* ES National Team Player ID */}
-           <motion.div 
-             id="esid-event"
-             variants={revealVariants}
-             initial="hidden"
-             whileInView="visible"
-             viewport={{ once: true }}
-             className="glass-panel p-8 text-center bg-white flex flex-col items-center gap-6 h-full"
-           >
-              <div className="w-full flex-1 flex flex-col">
-                <div className="min-h-[120px] flex flex-col justify-center">
-                  <h3 className="text-[#C8102E] text-3xl font-black mb-1 uppercase leading-tight">El Salvador National Team</h3>
-                  <p className="font-bold text-lg text-[#111] mb-6 uppercase tracking-tighter">Player ID Event</p>
-                </div>
-                <div className="flex-1 flex items-center justify-center">
-                  <div className="block transform transition-transform hover:scale-[1.02] mb-6">
-                    <img src="https://images.pacificregionalsoccer.com/ESID%2BPROCAMP2026%20-%201.png" alt="El Salvador ID Event" className="rounded-lg shadow-md max-w-full h-auto mx-auto" />
-                  </div>
-                </div>
-              </div>
-              <div className="w-full flex flex-col items-center gap-2">
-                <a 
-                  href="https://www.jotform.com/252498415438870" 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="btn-primary bg-gradient-to-br from-blue-600 to-blue-800 shadow-blue-200/50 btn-pulse-fall w-fit uppercase font-black"
-                >
-                  Register Now
-                </a>
-              </div>
            </motion.div>
         </div>
 
