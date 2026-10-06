@@ -10,7 +10,10 @@ import {
   Contact,
   GraduationCap,
   ArrowUp,
-  Book
+  Book,
+  Sparkles,
+  ArrowRight,
+  ShieldCheck
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -80,6 +83,9 @@ export default function Home() {
     { name: 'Coaches Resources', icon: GraduationCap, dropdown: [
       { name: 'Coaches Requirements', href: 'https://calsouth.com/wp-content/uploads/2024/05/Coaching-License-Checklist_IP-5_2024.pdf' },
       { name: 'Licensing & Education', href: '/#education' }
+    ]},
+    { name: 'Partners', dropdown: [
+      { name: 'SoCal Custom Canopies', href: '/socal-custom-canopies', highlight: true },
     ]},
     { name: 'Rules', icon: Book, dropdown: [
       { name: 'League Rules', href: '/rules' },
@@ -505,6 +511,60 @@ export default function Home() {
               <h3 className="text-xl font-bold uppercase mb-4">Coaching Education</h3>
               <a href="https://calsouth.com/competitive-licensing/" target="_blank" rel="noreferrer" className="btn-outline w-full max-w-[250px]">Click Here</a>
            </motion.div>
+        </div>
+      </section>
+
+      {/* Official League Partner Section */}
+      <section id="partners" className="py-20 px-[5%]">
+        <div className="text-center mb-12">
+          <h2 className="gradient-text text-4xl font-black uppercase mb-3">
+            Official League Partner
+          </h2>
+          <div className="w-16 h-1 bg-[#C8102E] mx-auto rounded-full" />
+        </div>
+
+        <div className="max-w-6xl mx-auto">
+          <div className="glass-panel bg-white p-8 lg:p-10 border-l-8 border-l-[#111111] border-b-8 border-b-[#C8102E]">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-7">
+                <div className="mb-4">
+                  <span className="dark-badge">OFFICIAL PARTNER</span>
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#111111] mb-3">
+                  SoCal Custom Canopies &amp; Print
+                </h3>
+                <p className="text-[#333333] leading-relaxed mb-6 text-base sm:text-lg">
+                  Pacific Regional Soccer League is proud to partner with SoCal Custom Canopies &amp; Print to provide PRSL clubs, teams, coaches, managers, and members access to custom canopies, table covers, flags, banners, signs, backdrops, and special PRSL member pricing.
+                </p>
+                <div className="flex flex-wrap items-center gap-4">
+                  <Link
+                    to="/socal-custom-canopies"
+                    className="btn-primary py-3.5 px-6 text-sm gap-2"
+                  >
+                    <span>VIEW OFFICIAL PARTNER PAGE</span>
+                    <ArrowRight size={16} />
+                  </Link>
+                  <a
+                    href="https://www.socalcustomcanopies.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-outline py-3.5 px-6 text-sm"
+                  >
+                    <span>VISIT SOCAL CUSTOM CANOPIES</span>
+                  </a>
+                </div>
+              </div>
+              <div className="lg:col-span-5">
+                <Link to="/socal-custom-canopies" className="block rounded-lg overflow-hidden shadow-md border border-black/10">
+                  <img
+                    src="https://images.pacificregionalsoccer.com/Image%20Oct%202%2C%202026%2C%2012_50_07%20PM.png"
+                    alt="PRSL x SoCal Custom Canopies Official Partnership Banner"
+                    className="w-full h-auto block"
+                  />
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

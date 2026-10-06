@@ -1,0 +1,520 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 800" width="100%" height="100%">
+  <defs>
+    <!-- Sky & Pitch Gradients -->
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2B72A4" />
+      <stop offset="35%" stop-color="#5599C8" />
+      <stop offset="70%" stop-color="#93C6E7" />
+      <stop offset="100%" stop-color="#D5ECF8" />
+    </linearGradient>
+
+    <linearGradient id="grassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#548235" />
+      <stop offset="40%" stop-color="#385723" />
+      <stop offset="100%" stop-color="#243816" />
+    </linearGradient>
+
+    <!-- Mountain Silhouette Gradient -->
+    <linearGradient id="mountainGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6C5B7B" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#355C7D" stop-opacity="0.95" />
+    </linearGradient>
+
+    <!-- Left Overlay Gradient for Text Contrast -->
+    <linearGradient id="leftScrim" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#050E1B" stop-opacity="0.98" />
+      <stop offset="35%" stop-color="#0A192F" stop-opacity="0.94" />
+      <stop offset="55%" stop-color="#0A192F" stop-opacity="0.75" />
+      <stop offset="75%" stop-color="#0A192F" stop-opacity="0.2" />
+      <stop offset="100%" stop-color="#0A192F" stop-opacity="0.0" />
+    </linearGradient>
+
+    <!-- Gold Gradients for Logos -->
+    <linearGradient id="goldSheenHero" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDF3CD" />
+      <stop offset="50%" stop-color="#D4AF37" />
+      <stop offset="100%" stop-color="#997015" />
+    </linearGradient>
+
+    <!-- Drop Shadows -->
+    <filter id="heroShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+  </defs>
+
+  <!-- ================= BACKGROUND: CALIFORNIA MOUNTAINS & SOCCER PITCH ================= -->
+  <!-- Sky -->
+  <rect x="0" y="0" width="1920" height="480" fill="url(#skyGrad)" />
+
+  <!-- California Mountain Ridge Silhouette -->
+  <polygon points="0,380 180,310 320,340 480,290 620,330 760,280 920,315 1060,260 1200,300 1340,250 1480,285 1640,240 1780,270 1920,250 1920,480 0,480" fill="url(#mountainGrad)" />
+
+  <!-- Lush Soccer Pitch Grass -->
+  <rect x="0" y="440" width="1920" height="280" fill="url(#grassGrad)" />
+  <!-- Pitch Mowing Stripes -->
+  <rect x="750" y="440" width="160" height="280" fill="#FFFFFF" fill-opacity="0.04" />
+  <rect x="1070" y="440" width="160" height="280" fill="#FFFFFF" fill-opacity="0.04" />
+  <rect x="1390" y="440" width="160" height="280" fill="#FFFFFF" fill-opacity="0.04" />
+  <rect x="1710" y="440" width="160" height="280" fill="#FFFFFF" fill-opacity="0.04" />
+
+  <!-- Distant Palm Trees -->
+  <g transform="translate(780, 220) scale(0.65)" opacity="0.7">
+    <path d="M 0,220 Q 15,100 5,0" fill="none" stroke="#2D3748" stroke-width="6" />
+    <path d="M 5,0 Q -40,-30 -60,0 M 5,0 Q 40,-30 60,0 M 5,0 Q -25,-50 0,-60 M 5,0 Q 25,-50 10,-60 M 5,0 Q -50,10 -70,25 M 5,0 Q 50,10 70,25" fill="none" stroke="#22543D" stroke-width="4.5" />
+  </g>
+  <g transform="translate(830, 240) scale(0.55)" opacity="0.65">
+    <path d="M 0,220 Q -10,100 0,0" fill="none" stroke="#2D3748" stroke-width="6" />
+    <path d="M 0,0 Q -40,-30 -60,0 M 0,0 Q 40,-30 60,0 M 0,0 Q -25,-50 0,-60 M 0,0 Q 25,-50 10,-60" fill="none" stroke="#22543D" stroke-width="4.5" />
+  </g>
+
+  <!-- ================= RIGHT SIDE: REALISTIC SOCCER SIDELINE GEAR ================= -->
+  
+  <!-- Team Bench Folding Chairs -->
+  <g transform="translate(1000, 480)" filter="url(#heroShadow)">
+    <rect x="0" y="0" width="40" height="35" rx="3" fill="#1A202C" />
+    <line x1="5" y1="35" x2="0" y2="80" stroke="#718096" stroke-width="3" />
+    <line x1="35" y1="35" x2="40" y2="80" stroke="#718096" stroke-width="3" />
+    <line x1="5" y1="0" x2="35" y2="0" stroke="#CBD5E1" stroke-width="2" />
+  </g>
+  <g transform="translate(1045, 480)" filter="url(#heroShadow)">
+    <rect x="0" y="0" width="40" height="35" rx="3" fill="#1A202C" />
+    <line x1="5" y1="35" x2="0" y2="80" stroke="#718096" stroke-width="3" />
+    <line x1="35" y1="35" x2="40" y2="80" stroke="#718096" stroke-width="3" />
+  </g>
+
+  <!-- 1. LEFT FEATHER FLAG (12ft Teardrop Flag) -->
+  <g transform="translate(870, 70)" filter="url(#heroShadow)">
+    <!-- Base Weight Stand -->
+    <ellipse cx="25" cy="530" rx="32" ry="10" fill="#171923" />
+    <ellipse cx="25" cy="528" rx="26" ry="7" fill="#2D3748" />
+
+    <!-- Curved Aviation Pole -->
+    <path d="M 25,530 L 25,180 Q 25,20 140,20 Q 155,20 165,30" fill="none" stroke="#1A202C" stroke-width="6" />
+
+    <!-- Flag Fabric (Navy with Red/White Angled Stripes) -->
+    <path d="M 25,30 Q 140,20 155,40 Q 170,80 155,180 L 140,480 Q 120,500 25,500 Z" fill="#0A192F" stroke="#C8102E" stroke-width="3" />
+    
+    <!-- Red & White Diagonal Stripes on Flag -->
+    <polygon points="25,440 145,390 142,420 25,470" fill="#C8102E" />
+    <polygon points="25,470 142,420 140,435 25,485" fill="#FFFFFF" />
+
+    <!-- PRSL Crest at Flag Top -->
+    <circle cx="95" cy="95" r="26" fill="#C8102E" stroke="#FFFFFF" stroke-width="2" />
+    <text x="95" y="99" font-family="'Inter', sans-serif" font-weight="900" font-size="9" fill="#FFFFFF" text-anchor="middle">PRSL</text>
+
+    <!-- Vertical Text on Flag: "PACIFIC REGIONAL SOCCER LEAGUE" -->
+    <g transform="translate(95, 340) rotate(-90)">
+      <text x="0" y="0" font-family="'Inter', Arial, sans-serif" font-weight="900" font-size="19" fill="#FFFFFF" letter-spacing="3" text-anchor="middle">
+        PACIFIC REGIONAL SOCCER LEAGUE
+      </text>
+    </g>
+  </g>
+
+  <!-- 2. OFFICIAL CUSTOM 10x10 CANOPY TENT (Centerpiece) -->
+  <g transform="translate(1000, 20)" filter="url(#heroShadow)">
+    
+    <!-- Canopy Shadow on Grass -->
+    <polygon points="50,540 680,540 600,580 -20,580" fill="#000000" fill-opacity="0.35" />
+
+    <!-- Hex Aluminum Legs (4 Legs) -->
+    <!-- Back Left Leg -->
+    <line x1="80" y1="260" x2="80" y2="520" stroke="#CBD5E1" stroke-width="6" />
+    <line x1="80" y1="260" x2="80" y2="520" stroke="#4A5568" stroke-width="2" />
+    <!-- Back Right Leg -->
+    <line x1="580" y1="260" x2="580" y2="520" stroke="#CBD5E1" stroke-width="6" />
+    <line x1="580" y1="260" x2="580" y2="520" stroke="#4A5568" stroke-width="2" />
+
+    <!-- Cross Truss Bracing behind Table -->
+    <line x1="60" y1="280" x2="600" y2="340" stroke="#CBD5E1" stroke-width="2.5" opacity="0.6" />
+    <line x1="60" y1="340" x2="600" y2="280" stroke="#CBD5E1" stroke-width="2.5" opacity="0.6" />
+
+    <!-- Canopy Peak Fabric (Navy #0A192F with Red Valance) -->
+    <!-- Peak Triangle Face (Front) -->
+    <polygon points="330,40 50,260 610,260" fill="#0C1B33" stroke="#060E1A" stroke-width="2" />
+    <!-- Left Slope Shade -->
+    <polygon points="330,40 50,260 330,260" fill="#081426" fill-opacity="0.4" />
+    
+    <!-- PRSL Shield Crest on Peak Center -->
+    <g transform="translate(330, 160) scale(1.1)">
+      <!-- Red Shield Base -->
+      <path d="M 0,-45 Q 35,-45 42,-35 Q 42,10 0,45 Q -42,10 -42,-35 Q -35,-45 0,-45 Z" fill="#C8102E" stroke="#FFFFFF" stroke-width="2.5" />
+      <!-- Soccer Ball with Motion Trail -->
+      <circle cx="0" cy="-12" r="14" fill="#FFFFFF" stroke="#000000" stroke-width="1.2" />
+      <polygon points="0,-16 4,-12 2,-7 -2,-7 -4,-12" fill="#111" />
+      <!-- Banner with Text -->
+      <rect x="-38" y="6" width="76" height="13" fill="#FFFFFF" rx="1" />
+      <text x="0" y="16" font-family="'Inter', sans-serif" font-weight="900" font-size="7" fill="#C8102E" text-anchor="middle">PACIFIC REGIONAL</text>
+      <rect x="-32" y="19" width="64" height="10" fill="#C8102E" rx="1" />
+      <text x="0" y="27" font-family="'Inter', sans-serif" font-weight="800" font-size="6" fill="#FFFFFF" text-anchor="middle">SOCCER LEAGUE</text>
+    </g>
+
+    <!-- Side Peak Sub-logos -->
+    <g transform="translate(130, 225) scale(0.6)">
+      <path d="M 0,-30 Q 25,-30 30,-22 Q 30,10 0,35 Q -30,10 -30,-22 Q -25,-30 0,-30 Z" fill="#C8102E" stroke="#FFFFFF" stroke-width="2" />
+      <text x="0" y="5" font-family="'Inter', sans-serif" font-weight="900" font-size="10" fill="#FFFFFF" text-anchor="middle">PRSL</text>
+    </g>
+    <g transform="translate(530, 225) scale(0.6)">
+      <path d="M 0,-30 Q 25,-30 30,-22 Q 30,10 0,35 Q -30,10 -30,-22 Q -25,-30 0,-30 Z" fill="#C8102E" stroke="#FFFFFF" stroke-width="2" />
+      <text x="0" y="5" font-family="'Inter', sans-serif" font-weight="900" font-size="10" fill="#FFFFFF" text-anchor="middle">PRSL</text>
+    </g>
+
+    <!-- Front Valance (Horizontal Band across Canopy Base) -->
+    <rect x="50" y="260" width="560" height="52" fill="#0A192F" stroke="#C8102E" stroke-width="2.5" />
+    <rect x="50" y="306" width="560" height="6" fill="#C8102E" />
+
+    <!-- "PACIFIC REGIONAL SOCCER LEAGUE" Front Valance Bold Text -->
+    <text x="330" y="294" font-family="'Inter', Arial, sans-serif" font-weight="900" font-size="22" fill="#FFFFFF" text-anchor="middle" letter-spacing="3">
+      PACIFIC REGIONAL SOCCER LEAGUE
+    </text>
+
+    <!-- Front Left Leg -->
+    <line x1="50" y1="312" x2="50" y2="570" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" />
+    <line x1="50" y1="312" x2="50" y2="570" stroke="#4A5568" stroke-width="2.5" />
+    <!-- Front Right Leg -->
+    <line x1="610" y1="312" x2="610" y2="570" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round" />
+    <line x1="610" y1="312" x2="610" y2="570" stroke="#4A5568" stroke-width="2.5" />
+  </g>
+
+  <!-- 3. CUSTOM STRETCH TABLE COVER (Center front) -->
+  <g transform="translate(1080, 430)" filter="url(#heroShadow)">
+    <!-- Folded Team Jerseys / Clipboards on Table -->
+    <rect x="35" y="-12" width="70" height="12" rx="2" fill="#0A192F" stroke="#C8102E" stroke-width="1.5" />
+    <rect x="120" y="-10" width="45" height="10" rx="1" fill="#FFFFFF" stroke="#0A192F" stroke-width="1.5" />
+    <rect x="280" y="-12" width="70" height="12" rx="2" fill="#0A192F" stroke="#C8102E" stroke-width="1.5" />
+    <cylinder cx="390" cy="-6" rx="10" ry="15" fill="#111" />
+
+    <!-- Main Fitted Stretch Table Front -->
+    <polygon points="10,0 470,0 495,150 -15,150" fill="#0A192F" stroke="#1E293B" stroke-width="1.5" />
+    
+    <!-- Red & White Diagonal Stripes on Table Left & Right -->
+    <polygon points="10,0 75,0 35,150 -15,150" fill="#C8102E" />
+    <polygon points="75,0 95,0 55,150 35,150" fill="#FFFFFF" />
+    
+    <polygon points="405,0 470,0 495,150 455,150" fill="#C8102E" />
+    <polygon points="385,0 405,0 455,150 435,150" fill="#FFFFFF" />
+
+    <!-- PRSL Crest on Table Center -->
+    <g transform="translate(240, 60) scale(1.05)">
+      <path d="M 0,-36 Q 28,-36 34,-26 Q 34,10 0,38 Q -34,10 -34,-26 Q -28,-36 0,-36 Z" fill="#C8102E" stroke="#FFFFFF" stroke-width="2" />
+      <circle cx="0" cy="-10" r="10" fill="#FFFFFF" stroke="#000" stroke-width="1" />
+      <rect x="-30" y="4" width="60" height="11" fill="#FFFFFF" rx="1" />
+      <text x="0" y="12" font-family="'Inter', sans-serif" font-weight="900" font-size="5.5" fill="#C8102E" text-anchor="middle">PACIFIC REGIONAL</text>
+      <rect x="-24" y="15" width="48" height="8" fill="#C8102E" rx="1" />
+      <text x="0" y="21" font-family="'Inter', sans-serif" font-weight="800" font-size="5" fill="#FFFFFF" text-anchor="middle">SOCCER LEAGUE</text>
+    </g>
+
+    <text x="240" y="120" font-family="'Inter', sans-serif" font-weight="900" font-size="16" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">
+      PACIFIC REGIONAL
+    </text>
+    <text x="240" y="137" font-family="'Inter', sans-serif" font-weight="800" font-size="12" fill="#FFFFFF" text-anchor="middle" letter-spacing="3">
+      SOCCER LEAGUE
+    </text>
+  </g>
+
+  <!-- 4. RIGHT FEATHER FLAG (12ft Teardrop Flag) -->
+  <g transform="translate(1730, 20)" filter="url(#heroShadow)">
+    <!-- Base Weight Stand -->
+    <ellipse cx="25" cy="570" rx="32" ry="10" fill="#171923" />
+    <ellipse cx="25" cy="568" rx="26" ry="7" fill="#2D3748" />
+
+    <!-- Curved Aviation Pole -->
+    <path d="M 25,570 L 25,180 Q 25,20 140,20 Q 155,20 165,30" fill="none" stroke="#1A202C" stroke-width="6" />
+
+    <!-- Flag Fabric (Navy with Red/White Angled Stripes) -->
+    <path d="M 25,30 Q 140,20 155,40 Q 170,80 155,180 L 140,510 Q 120,530 25,530 Z" fill="#0A192F" stroke="#C8102E" stroke-width="3" />
+    
+    <!-- Red & White Diagonal Stripes on Flag -->
+    <polygon points="25,470 145,420 142,450 25,500" fill="#C8102E" />
+    <polygon points="25,500 142,450 140,465 25,515" fill="#FFFFFF" />
+
+    <!-- PRSL Crest at Flag Top -->
+    <circle cx="95" cy="95" r="26" fill="#C8102E" stroke="#FFFFFF" stroke-width="2" />
+    <text x="95" y="99" font-family="'Inter', sans-serif" font-weight="900" font-size="9" fill="#FFFFFF" text-anchor="middle">PRSL</text>
+
+    <!-- Vertical Text on Flag: "PACIFIC REGIONAL SOCCER LEAGUE" -->
+    <g transform="translate(95, 370) rotate(-90)">
+      <text x="0" y="0" font-family="'Inter', Arial, sans-serif" font-weight="900" font-size="19" fill="#FFFFFF" letter-spacing="3" text-anchor="middle">
+        PACIFIC REGIONAL SOCCER LEAGUE
+      </text>
+    </g>
+  </g>
+
+  <!-- 5. A-FRAME POP-UP SIDELINE BANNER (Far Right Grass) -->
+  <g transform="translate(1620, 520)" filter="url(#heroShadow)">
+    <polygon points="0,70 30,0 210,0 240,70" fill="#0A192F" stroke="#FFFFFF" stroke-width="2" />
+    <polygon points="0,70 15,35 225,35 240,70" fill="#C8102E" fill-opacity="0.3" />
+    
+    <!-- Crest on Banner -->
+    <circle cx="50" cy="35" r="16" fill="#C8102E" stroke="#FFFFFF" stroke-width="1.5" />
+    <text x="50" y="38" font-family="'Inter', sans-serif" font-weight="900" font-size="7" fill="#FFFFFF" text-anchor="middle">PRSL</text>
+
+    <text x="75" y="30" font-family="'Inter', sans-serif" font-weight="900" font-size="12" fill="#FFFFFF" letter-spacing="1">
+      PACIFIC REGIONAL
+    </text>
+    <text x="75" y="46" font-family="'Inter', sans-serif" font-weight="800" font-size="10" fill="#FFFFFF" letter-spacing="2">
+      SOCCER LEAGUE
+    </text>
+  </g>
+
+
+  <!-- ================= LEFT SIDE: OFFICIAL PARTNERSHIP ANNOUNCEMENT ================= -->
+  <!-- Left Scrim for Crisp Contrast -->
+  <rect x="0" y="0" width="1050" height="715" fill="url(#leftScrim)" />
+
+  <!-- Partnership Logos (PRSL Shield Crest ✕ SoCal Custom Canopies Logo) -->
+  <g transform="translate(100, 45)">
+    
+    <!-- PRSL Shield Logo -->
+    <g transform="translate(0, 0)">
+      <!-- Red Shield with White & Gold Border -->
+      <path d="M 65,0 Q 130,0 140,25 Q 140,140 65,225 Q -10,140 -10,25 Q 0,0 65,0 Z" fill="#C8102E" stroke="#FFFFFF" stroke-width="4.5" filter="url(#heroShadow)" />
+      
+      <!-- Inner Gold Edge -->
+      <path d="M 65,7 Q 123,7 132,30 Q 132,135 65,215 Q -2,135 -2,30 Q 7,7 65,7 Z" fill="none" stroke="url(#goldSheenHero)" stroke-width="2" />
+
+      <!-- Soccer Ball in Flight with Curved Motion Streaks -->
+      <circle cx="95" cy="55" r="28" fill="#FFFFFF" stroke="#1A202C" stroke-width="2.5" />
+      <polygon points="95,45 104,52 101,62 89,62 86,52" fill="#1A202C" />
+      <polygon points="95,45 86,52 75,48 76,38 88,36" fill="#CBD5E1" stroke="#1A202C" stroke-width="1.2" />
+      <polygon points="95,45 104,52 115,48 114,38 102,36" fill="#CBD5E1" stroke="#1A202C" stroke-width="1.2" />
+
+      <!-- Curved Motion Whistle Streaks -->
+      <path d="M 20,40 Q 60,35 75,48" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" />
+      <path d="M 12,56 Q 55,50 72,62" fill="none" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" />
+      <path d="M 18,72 Q 55,68 68,76" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" />
+
+      <!-- Pacific Ocean Wave Lines -->
+      <path d="M 10,110 Q 35,95 65,110 Q 95,125 125,110" fill="none" stroke="#FFFFFF" stroke-width="3" />
+      <path d="M 15,122 Q 40,107 65,122 Q 90,137 120,122" fill="none" stroke="#FFFFFF" stroke-width="3" />
+
+      <!-- White Banner: "PACIFIC REGIONAL" -->
+      <rect x="-2" y="132" width="134" height="26" fill="#FFFFFF" rx="2" stroke="#C8102E" stroke-width="1.5" />
+      <text x="65" y="150" font-family="'Inter', Arial Black, sans-serif" font-weight="900" font-size="12" fill="#C8102E" text-anchor="middle" letter-spacing="1">
+        PACIFIC REGIONAL
+      </text>
+
+      <!-- Red Banner: "SOCCER LEAGUE" -->
+      <rect x="8" y="158" width="114" height="22" fill="#0A192F" rx="2" stroke="#FFFFFF" stroke-width="1.2" />
+      <text x="65" y="174" font-family="'Inter', Arial Black, sans-serif" font-weight="900" font-size="11" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">
+        SOCCER LEAGUE
+      </text>
+
+      <!-- 3 White Stars -->
+      <polygon points="45,192 48,185 53,190 47,192 50,198 44,194 38,198 41,192 35,190 41,185" fill="#FFFFFF" />
+      <polygon points="65,197 68,190 73,195 67,197 70,203 64,199 58,203 61,197 55,195 61,190" fill="#FFFFFF" />
+      <polygon points="85,192 88,185 93,190 87,192 90,198 84,194 78,198 81,192 75,190 81,185" fill="#FFFFFF" />
+    </g>
+
+    <!-- White "✕" Cross Symbol -->
+    <text x="215" y="130" font-family="'Inter', sans-serif" font-weight="300" font-size="46" fill="#FFFFFF" opacity="0.9" text-anchor="middle">
+      ✕
+    </text>
+
+    <!-- SoCal Custom Canopies Logo Badge -->
+    <g transform="translate(290, 8) scale(0.48)" filter="url(#heroShadow)">
+      <!-- Background Plate -->
+      <rect x="0" y="0" width="460" height="460" rx="24" fill="#14171A" stroke="#2D333B" stroke-width="3" />
+      
+      <!-- Arced PRINT & SIGNS -->
+      <path id="heroArc" d="M 80, 115 A 180,180 0 0,1 380, 115" fill="none" />
+      <text font-family="'Cinzel', serif" font-weight="800" font-size="24" fill="url(#goldSheenHero)" letter-spacing="8">
+        <textPath href="#heroArc" startOffset="50%" text-anchor="middle">
+          PRINT &amp; SIGNS
+        </textPath>
+      </text>
+
+      <!-- Gold Canopy Graphic -->
+      <polygon points="230,85 130,135 330,135" fill="none" stroke="url(#goldSheenHero)" stroke-width="4.5" />
+      <line x1="230" y1="85" x2="230" y2="165" stroke="url(#goldSheenHero)" stroke-width="3" />
+      <line x1="130" y1="165" x2="330" y2="165" stroke="url(#goldSheenHero)" stroke-width="4" stroke-linecap="round" />
+      <line x1="135" y1="165" x2="135" y2="255" stroke="url(#goldSheenHero)" stroke-width="4.5" />
+      <line x1="325" y1="165" x2="325" y2="255" stroke="url(#goldSheenHero)" stroke-width="4.5" />
+      <line x1="215" y1="165" x2="215" y2="240" stroke="url(#goldSheenHero)" stroke-width="2.5" />
+      <line x1="245" y1="165" x2="245" y2="240" stroke="url(#goldSheenHero)" stroke-width="2.5" />
+      <path d="M 115, 265 Q 230, 245 345, 265" fill="none" stroke="url(#goldSheenHero)" stroke-width="4" />
+
+      <!-- Star and Palm Trees in Canopy -->
+      <polygon points="175,200 179,190 189,190 182,197 184,207 175,202 166,207 168,197 161,190 171,190" fill="url(#goldSheenHero)" />
+      <path d="M 285,225 Q 282,205 290,185" fill="none" stroke="url(#goldSheenHero)" stroke-width="3.5" />
+      <path d="M 290,185 Q 275,175 265,185 M 290,185 Q 305,175 315,185 M 290,185 Q 285,165 280,160" fill="none" stroke="url(#goldSheenHero)" stroke-width="2.5" />
+
+      <!-- Large SOCAL -->
+      <text x="230" y="340" font-family="'Cinzel', serif" font-weight="900" font-size="78" fill="url(#goldSheenHero)" text-anchor="middle" letter-spacing="4">
+        SOCAL
+      </text>
+
+      <!-- Ribbon CUSTOM CANOPIES -->
+      <path d="M 115,355 Q 230,372 345,355 L 345,388 Q 230,405 115,388 Z" fill="url(#goldSheenHero)" />
+      <text x="230" y="380" font-family="'Cinzel', sans-serif" font-weight="900" font-size="18" fill="#111" text-anchor="middle" letter-spacing="3">
+        CUSTOM CANOPIES
+      </text>
+
+      <!-- URL -->
+      <text x="230" y="425" font-family="'Inter', sans-serif" font-weight="700" font-size="14" fill="url(#goldSheenHero)" text-anchor="middle">
+        SoCalcustomcanopies.com
+      </text>
+    </g>
+  </g>
+
+  <!-- Red Brush Stroke: "OFFICIAL PARTNER" -->
+  <g transform="translate(100, 310)">
+    <!-- Red Brush Stroke Banner -->
+    <path d="M 0,15 L 20,2 L 320,0 L 335,18 L 315,36 L 5,34 Z" fill="#C8102E" />
+    <path d="M -8,18 L 10,8 L 330,6 L 340,24 L 325,32 L -2,32 Z" fill="#990C22" opacity="0.4" />
+    <text x="165" y="24" font-family="'Inter', Arial Black, sans-serif" font-weight="900" font-size="15" fill="#FFFFFF" text-anchor="middle" letter-spacing="4">
+      OFFICIAL PARTNER
+    </text>
+  </g>
+
+  <!-- Big Bold Typography: PACIFIC REGIONAL SOCCER LEAGUE -->
+  <g transform="translate(100, 395)" filter="url(#heroShadow)">
+    <text x="0" y="0" font-family="'Inter', Arial Black, sans-serif" font-weight="900" font-size="62" fill="#FFFFFF" letter-spacing="1">
+      PACIFIC REGIONAL
+    </text>
+    <text x="0" y="58" font-family="'Inter', Arial Black, sans-serif" font-weight="900" font-size="64" fill="#C8102E" letter-spacing="1">
+      SOCCER LEAGUE
+    </text>
+  </g>
+
+  <!-- Subheadline -->
+  <g transform="translate(100, 500)">
+    <text x="0" y="0" font-family="'Inter', Arial Black, sans-serif" font-weight="900" font-size="24" fill="#FFFFFF" letter-spacing="2">
+      OFFICIAL CUSTOM CANOPY &amp; PRINTING PARTNER
+    </text>
+  </g>
+
+  <!-- Paragraph Copy -->
+  <g transform="translate(100, 545)">
+    <text x="0" y="0" font-family="'Inter', sans-serif" font-weight="600" font-size="18.5" fill="#E2E8F0" letter-spacing="0.2">
+      Providing PRSL clubs, teams and members with professional
+    </text>
+    <text x="0" y="28" font-family="'Inter', sans-serif" font-weight="600" font-size="18.5" fill="#E2E8F0" letter-spacing="0.2">
+      custom-branded products for game days, tournaments,
+    </text>
+    <text x="0" y="56" font-family="'Inter', sans-serif" font-weight="600" font-size="18.5" fill="#E2E8F0" letter-spacing="0.2">
+      tryouts, events and more.
+    </text>
+  </g>
+
+
+  <!-- ================= BOTTOM STRIP: PRODUCT ICONS WITH RED DIVIDERS ================= -->
+  <!-- Dark Navy Horizontal Banner Strip -->
+  <rect x="0" y="715" width="1920" height="85" fill="#060E1A" stroke="#C8102E" stroke-width="3" />
+  <!-- Red Top Accent Line -->
+  <line x1="0" y1="715" x2="1920" y2="715" stroke="#C8102E" stroke-width="4" />
+
+  <!-- 7 Product Icons & Labels -->
+  <!-- 1. CUSTOM CANOPIES -->
+  <g transform="translate(60, 730)">
+    <!-- Canopy Line Icon -->
+    <path d="M 32,5 L 5,20 L 60,20 Z" fill="none" stroke="#FFFFFF" stroke-width="2.5" />
+    <line x1="32" y1="5" x2="32" y2="20" stroke="#FFFFFF" stroke-width="2" />
+    <rect x="5" y="20" width="55" height="5" fill="#C8102E" />
+    <line x1="8" y1="25" x2="8" y2="52" stroke="#FFFFFF" stroke-width="2.5" />
+    <line x1="57" y1="25" x2="57" y2="52" stroke="#FFFFFF" stroke-width="2.5" />
+    <line x1="25" y1="25" x2="25" y2="48" stroke="#FFFFFF" stroke-width="1.5" />
+    <line x1="40" y1="25" x2="40" y2="48" stroke="#FFFFFF" stroke-width="1.5" />
+    <!-- Label -->
+    <text x="75" y="30" font-family="'Inter', sans-serif" font-weight="900" font-size="13" fill="#FFFFFF" letter-spacing="1">
+      CUSTOM
+    </text>
+    <text x="75" y="46" font-family="'Inter', sans-serif" font-weight="900" font-size="13" fill="#FFFFFF" letter-spacing="1">
+      CANOPIES
+    </text>
+  </g>
+
+  <!-- Red Vertical Divider 1 -->
+  <line x1="285" y1="730" x2="285" y2="785" stroke="#C8102E" stroke-width="2" />
+
+  <!-- 2. TABLE COVERS -->
+  <g transform="translate(325, 730)">
+    <polygon points="5,15 55,15 60,48 0,48" fill="none" stroke="#FFFFFF" stroke-width="2" />
+    <line x1="12" y1="15" x2="12" y2="48" stroke="#C8102E" stroke-width="2" />
+    <line x1="48" y1="15" x2="48" y2="48" stroke="#C8102E" stroke-width="2" />
+    <!-- Label -->
+    <text x="75" y="30" font-family="'Inter', sans-serif" font-weight="900" font-size="13" fill="#FFFFFF" letter-spacing="1">
+      TABLE
+    </text>
+    <text x="75" y="46" font-family="'Inter', sans-serif" font-weight="900" font-size="13" fill="#FFFFFF" letter-spacing="1">
+      COVERS
+    </text>
+  </g>
+
+  <!-- Red Vertical Divider 2 -->
+  <line x1="510" y1="730" x2="510" y2="785" stroke="#C8102E" stroke-width="2" />
+
+  <!-- 3. FLAGS -->
+  <g transform="translate(565, 730)">
+    <path d="M 10,50 L 10,18 Q 10,2 35,2 Q 42,2 45,10 Q 48,22 42,32 L 10,40" fill="none" stroke="#FFFFFF" stroke-width="2.5" />
+    <path d="M 12,5 L 38,10 Q 42,22 36,32 L 12,38 Z" fill="#C8102E" fill-opacity="0.4" />
+    <!-- Label -->
+    <text x="60" y="38" font-family="'Inter', sans-serif" font-weight="900" font-size="14" fill="#FFFFFF" letter-spacing="1.5">
+      FLAGS
+    </text>
+  </g>
+
+  <!-- Red Vertical Divider 3 -->
+  <line x1="770" y1="730" x2="770" y2="785" stroke="#C8102E" stroke-width="2" />
+
+  <!-- 4. BANNERS -->
+  <g transform="translate(815, 730)">
+    <rect x="0" y="10" width="60" height="35" rx="2" fill="none" stroke="#FFFFFF" stroke-width="2" />
+    <circle cx="8" cy="18" r="2.5" fill="#FFFFFF" />
+    <circle cx="52" cy="18" r="2.5" fill="#FFFFFF" />
+    <circle cx="8" cy="37" r="2.5" fill="#FFFFFF" />
+    <circle cx="52" cy="37" r="2.5" fill="#FFFFFF" />
+    <!-- Label -->
+    <text x="75" y="38" font-family="'Inter', sans-serif" font-weight="900" font-size="14" fill="#FFFFFF" letter-spacing="1.5">
+      BANNERS
+    </text>
+  </g>
+
+  <!-- Red Vertical Divider 4 -->
+  <line x1="1040" y1="730" x2="1040" y2="785" stroke="#C8102E" stroke-width="2" />
+
+  <!-- 5. BACKDROPS -->
+  <g transform="translate(1085, 730)">
+    <rect x="0" y="8" width="55" height="42" fill="none" stroke="#FFFFFF" stroke-width="2" />
+    <line x1="0" y1="22" x2="55" y2="22" stroke="#FFFFFF" stroke-width="1.2" />
+    <line x1="0" y1="36" x2="55" y2="36" stroke="#FFFFFF" stroke-width="1.2" />
+    <line x1="18" y1="8" x2="18" y2="50" stroke="#FFFFFF" stroke-width="1.2" />
+    <line x1="37" y1="8" x2="37" y2="50" stroke="#FFFFFF" stroke-width="1.2" />
+    <!-- Label -->
+    <text x="70" y="38" font-family="'Inter', sans-serif" font-weight="900" font-size="14" fill="#FFFFFF" letter-spacing="1.5">
+      BACKDROPS
+    </text>
+  </g>
+
+  <!-- Red Vertical Divider 5 -->
+  <line x1="1340" y1="730" x2="1340" y2="785" stroke="#C8102E" stroke-width="2" />
+
+  <!-- 6. SIGNS -->
+  <g transform="translate(1385, 730)">
+    <rect x="5" y="5" width="48" height="35" rx="3" fill="none" stroke="#FFFFFF" stroke-width="2" />
+    <line x1="12" y1="14" x2="45" y2="14" stroke="#C8102E" stroke-width="1.8" />
+    <line x1="12" y1="22" x2="45" y2="22" stroke="#FFFFFF" stroke-width="1.5" />
+    <line x1="12" y1="30" x2="35" y2="30" stroke="#FFFFFF" stroke-width="1.5" />
+    <line x1="29" y1="40" x2="29" y2="52" stroke="#FFFFFF" stroke-width="2.5" />
+    <line x1="18" y1="52" x2="40" y2="52" stroke="#FFFFFF" stroke-width="2.5" />
+    <!-- Label -->
+    <text x="68" y="38" font-family="'Inter', sans-serif" font-weight="900" font-size="14" fill="#FFFFFF" letter-spacing="1.5">
+      SIGNS
+    </text>
+  </g>
+
+  <!-- Red Vertical Divider 6 -->
+  <line x1="1580" y1="730" x2="1580" y2="785" stroke="#C8102E" stroke-width="2" />
+
+  <!-- 7. CUSTOM PRINTING & MORE -->
+  <g transform="translate(1620, 730)">
+    <!-- T-Shirt / Apparel Icon -->
+    <path d="M 12,12 L 20,5 Q 30,12 40,5 L 48,12 L 42,22 L 36,18 L 36,50 L 24,50 L 24,18 L 18,22 Z" fill="none" stroke="#FFFFFF" stroke-width="2" />
+    <!-- Label -->
+    <text x="65" y="30" font-family="'Inter', sans-serif" font-weight="900" font-size="13" fill="#FFFFFF" letter-spacing="1">
+      CUSTOM
+    </text>
+    <text x="65" y="46" font-family="'Inter', sans-serif" font-weight="900" font-size="13" fill="#FFFFFF" letter-spacing="1">
+      PRINTING &amp; MORE
+    </text>
+  </g>
+</svg>

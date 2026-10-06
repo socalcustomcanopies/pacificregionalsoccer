@@ -51,6 +51,9 @@ export default function SpringLeague() {
       { name: 'Coaches Requirements', href: 'https://calsouth.com/wp-content/uploads/2024/05/Coaching-License-Checklist_IP-5_2024.pdf' },
       { name: 'Licensing & Education', href: '/#education' }
     ]},
+    { name: 'Partners', dropdown: [
+      { name: 'SoCal Custom Canopies', href: '/socal-custom-canopies', highlight: true },
+    ]},
     { name: 'Rules', dropdown: [
       { name: 'League Rules', href: '/rules' },
       { name: 'Age Matrix', href: '/age-matrix' },

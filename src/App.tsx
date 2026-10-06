@@ -11,6 +11,7 @@ import SpringLeague from './pages/SpringLeague';
 import Tournaments from './pages/Tournaments';
 import AgeMatrix from './pages/AgeMatrix';
 import Success from './pages/Success';
+import SoCalCustomCanopies from './pages/SoCalCustomCanopies';
 
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
@@ -40,6 +41,9 @@ export default function App() {
         <Route path="/tournaments" element={<Tournaments />} />
         <Route path="/age-matrix" element={<AgeMatrix />} />
         <Route path="/success" element={<Success />} />
+        <Route path="/socal-custom-canopies" element={<SoCalCustomCanopies />} />
+        <Route path="/partners" element={<SoCalCustomCanopies />} />
+        <Route path="/partners/socal-custom-canopies" element={<SoCalCustomCanopies />} />
       </Routes>
     </Router>
   );
