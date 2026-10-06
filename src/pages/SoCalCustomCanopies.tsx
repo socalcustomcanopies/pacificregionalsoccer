@@ -16,81 +16,15 @@ import {
   Trash2,
   X,
   CheckCircle2,
-  FileSpreadsheet,
-  LogOut,
   AlertCircle
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { User } from 'firebase/auth';
-import {
-  initAuth,
-  googleSignIn,
-  getAccessToken,
-  logout,
-  sendQuoteEmails,
-  appendQuoteToGoogleSheet,
-  createQuoteSpreadsheet,
-  PARTNER_NOTIFICATION_EMAIL,
-  type QuoteSubmissionPayload
-} from '../services/googleWorkspace';
 
 const LOGO_URL = "https://images.pacificregionalsoccer.com/pacific%20regional%20soccer%20league%20logo.avif";
 const PARTNERSHIP_BANNER_URL = "https://images.pacificregionalsoccer.com/Image%20Oct%202%2C%202026%2C%2012_50_07%20PM.png";
 const SOCAL_LOGO_URL = "https://images.pacificregionalsoccer.com/SoCal%20Custom%20Canopies%20logo.jpg";
 const SOCAL_WEBSITE_URL = "https://www.socalcustomcanopies.com/";
-const SHEET_ID_STORAGE_KEY = 'prsl_socal_canopies_sheet_id';
-const SHEET_URL_STORAGE_KEY = 'prsl_socal_canopies_sheet_url';
-
-function GoogleSignInButton({
-  onClick,
-  disabled,
-  label = 'Sign in with Google'
-}: {
-  onClick: () => void;
-  disabled?: boolean;
-  label?: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className="gsi-material-button"
-    >
-      <div className="gsi-material-button-state" />
-      <div className="gsi-material-button-content-wrapper">
-        <div className="gsi-material-button-icon">
-          <svg
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 48 48"
-            style={{ display: 'block' }}
-          >
-            <path
-              fill="#EA4335"
-              d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
-            />
-            <path
-              fill="#4285F4"
-              d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"
-            />
-            <path
-              fill="#FBBC05"
-              d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"
-            />
-            <path
-              fill="#34A853"
-              d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"
-            />
-            <path fill="none" d="M0 0h48v48H0z" />
-          </svg>
-        </div>
-        <span className="gsi-material-button-contents">{label}</span>
-        <span style={{ display: 'none' }}>{label}</span>
-      </div>
-    </button>
-  );
-}
+const PARTNER_NOTIFICATION_EMAIL = "socalcustomcanopies@gmail.com";
 
 
 interface ProductCategory {
@@ -142,44 +76,11 @@ export default function SoCalCustomCanopies() {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
-  const [showConfirmSubmitModal, setShowConfirmSubmitModal] = useState(false);
-
-  // Google Workspace Auth & Google Sheets state
-  const [needsAuth, setNeedsAuth] = useState(true);
-  const [googleUser, setGoogleUser] = useState<User | null>(null);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
-
-  const defaultSheetEnv =
-    (import.meta as unknown as { env?: Record<string, string | undefined> }).env
-      ?.VITE_GOOGLE_SHEET_ID || '';
-
-  const [spreadsheetInput, setSpreadsheetInput] = useState<string>(() => {
-    return localStorage.getItem(SHEET_ID_STORAGE_KEY) || defaultSheetEnv || '';
-  });
-  const [savedSheetUrl, setSavedSheetUrl] = useState<string>(() => {
-    return localStorage.getItem(SHEET_URL_STORAGE_KEY) || '';
-  });
-  const [isCreatingSheet, setIsCreatingSheet] = useState(false);
   const [submissionResult, setSubmissionResult] = useState<{
+    emailConfigured: boolean;
     vendorEmailSent: boolean;
     confirmationEmailSent: boolean;
-    spreadsheetUrl: string;
-    sheetTabName: string;
   } | null>(null);
-
-  useEffect(() => {
-    const unsubscribe = initAuth(
-      (user) => {
-        setGoogleUser(user);
-        setNeedsAuth(false);
-      },
-      () => {
-        setGoogleUser(null);
-        setNeedsAuth(true);
-      }
-    );
-    return () => unsubscribe();
-  }, []);
 
   // Set SEO Page Title, Meta Description, and OpenGraph tags
   useEffect(() => {
@@ -218,7 +119,6 @@ export default function SoCalCustomCanopies() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setActiveProductModal(null);
-        setShowConfirmSubmitModal(false);
       }
     };
     window.addEventListener('scroll', handleScroll);
@@ -333,80 +233,16 @@ export default function SoCalCustomCanopies() {
     });
   };
 
-  const handleGoogleLogin = async (): Promise<string | null> => {
-    setIsLoggingIn(true);
-    setSubmissionError(null);
-    try {
-      const result = await googleSignIn();
-      if (result) {
-        setGoogleUser(result.user);
-        setNeedsAuth(false);
-        return result.accessToken;
-      }
-      return null;
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : 'Google Sign-In was cancelled or failed.';
-      setSubmissionError(message);
-      return null;
-    } finally {
-      setIsLoggingIn(false);
-    }
-  };
-
-  const handleGoogleLogout = async () => {
-    await logout();
-    setGoogleUser(null);
-    setNeedsAuth(true);
-  };
-
-  const handleCreateNewSheet = async () => {
-    setSubmissionError(null);
-    let token = await getAccessToken();
-    if (!token) {
-      token = await handleGoogleLogin();
-      if (!token) return;
-    }
-    setIsCreatingSheet(true);
-    try {
-      const created = await createQuoteSpreadsheet(token);
-      setSpreadsheetInput(created.spreadsheetId);
-      setSavedSheetUrl(created.spreadsheetUrl);
-      localStorage.setItem(SHEET_ID_STORAGE_KEY, created.spreadsheetId);
-      localStorage.setItem(SHEET_URL_STORAGE_KEY, created.spreadsheetUrl);
-    } catch (err) {
-      setSubmissionError(
-        err instanceof Error ? err.message : 'Failed to create Google Sheet.'
-      );
-    } finally {
-      setIsCreatingSheet(false);
-    }
-  };
-
-  const handleQuoteSubmit = (e: React.FormEvent) => {
+  const handleQuoteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!quoteForm.isPrslAffiliated) {
       return;
     }
-    setSubmissionError(null);
-    // Open mandatory user confirmation dialog before mutating Google Sheet / sending Gmail messages
-    setShowConfirmSubmitModal(true);
-  };
 
-  const executeConfirmedSubmission = async () => {
     setSubmissionError(null);
-    let token = await getAccessToken();
-    if (!token) {
-      setNeedsAuth(true);
-      token = await handleGoogleLogin();
-      if (!token) {
-        return;
-      }
-    }
-
     setIsSubmitting(true);
 
-    const payload: QuoteSubmissionPayload = {
+    const payload = {
       ...quoteForm,
       logos: logoFiles.map((item) => ({
         name: item.file.name,
@@ -418,57 +254,33 @@ export default function SoCalCustomCanopies() {
     };
 
     try {
-      // 1. Send notification email to socalcustomcanopies@gmail.com + confirmation email to submitter
-      const emailStatus = await sendQuoteEmails(token, payload);
+      const response = await fetch('/api/quote-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
 
-      // 2. Insert entry into Google Sheet
-      const sheetStatus = await appendQuoteToGoogleSheet(
-        token,
-        payload,
-        spreadsheetInput
-      );
+      const data = await response.json().catch(() => ({}));
 
-      // Save non-sensitive Spreadsheet ID & URL so subsequent entries use the same sheet
-      setSpreadsheetInput(sheetStatus.spreadsheetId);
-      setSavedSheetUrl(sheetStatus.spreadsheetUrl);
-      localStorage.setItem(SHEET_ID_STORAGE_KEY, sheetStatus.spreadsheetId);
-      localStorage.setItem(SHEET_URL_STORAGE_KEY, sheetStatus.spreadsheetUrl);
-
-      // 3. Optional webhook if configured
-      const configuredEndpoint = (
-        import.meta as unknown as { env?: Record<string, string | undefined> }
-      ).env?.VITE_PRSL_QUOTE_WEBHOOK_URL;
-
-      if (configuredEndpoint) {
-        await fetch(configuredEndpoint, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...payload,
-            spreadsheetUrl: sheetStatus.spreadsheetUrl,
-            source: 'PRSL Official Partner Page - SoCal Custom Canopies'
-          })
-        }).catch((err) => console.error('Optional webhook error:', err));
+      if (!response.ok || data.ok === false) {
+        throw new Error(
+          data.error || 'Unable to submit your quote request right now. Please try again.'
+        );
       }
 
       setSubmissionResult({
-        vendorEmailSent: emailStatus.vendorEmailSent,
-        confirmationEmailSent: emailStatus.confirmationEmailSent,
-        spreadsheetUrl: sheetStatus.spreadsheetUrl,
-        sheetTabName: sheetStatus.sheetTabName
+        emailConfigured: Boolean(data.emailConfigured),
+        vendorEmailSent: Boolean(data.vendorEmailSent),
+        confirmationEmailSent: Boolean(data.confirmationEmailSent)
       });
-      setShowConfirmSubmitModal(false);
       setFormSubmitted(true);
     } catch (err) {
-      console.error('Google Workspace submission error:', err);
-      const message =
+      console.error('Quote submission error:', err);
+      setSubmissionError(
         err instanceof Error
           ? err.message
-          : 'An error occurred while sending emails or updating Google Sheets.';
-      if (message.toLowerCase().includes('401') || message.toLowerCase().includes('unauthenticated')) {
-        setNeedsAuth(true);
-      }
-      setSubmissionError(message);
+          : 'An error occurred while submitting your quote request.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -1304,41 +1116,22 @@ export default function SoCalCustomCanopies() {
                   {quoteForm.teamName ? ` (${quoteForm.teamName})` : ''}.
                 </p>
 
-                {submissionResult && (
-                  <div className="bg-white/10 border border-white/15 rounded-lg p-5 mb-6 space-y-3 text-sm">
-                    <div className="flex items-start gap-2.5">
-                      <CheckCircle2 size={18} className="text-[#D4AF37] shrink-0 mt-0.5" />
-                      <span>
-                        Partner notification email sent to{' '}
-                        <strong className="text-white">{PARTNER_NOTIFICATION_EMAIL}</strong>
-                      </span>
-                    </div>
-                    <div className="flex items-start gap-2.5">
-                      <CheckCircle2 size={18} className="text-[#D4AF37] shrink-0 mt-0.5" />
-                      <span>
-                        Confirmation email sent to{' '}
-                        <strong className="text-white">{quoteForm.email}</strong>
-                      </span>
-                    </div>
-                    <div className="flex items-start gap-2.5">
-                      <CheckCircle2 size={18} className="text-[#D4AF37] shrink-0 mt-0.5" />
-                      <div>
-                        <span>
-                          Entry inserted into Google Sheet ({submissionResult.sheetTabName}):{' '}
-                        </span>
-                        <a
-                          href={submissionResult.spreadsheetUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[#D4AF37] font-bold underline hover:text-white inline-flex items-center gap-1 ml-1"
-                        >
-                          <span>Open Google Sheet</span>
-                          <ExternalLink size={13} />
-                        </a>
-                      </div>
-                    </div>
+                <div className="bg-white/10 border border-white/15 rounded-lg p-5 mb-6 space-y-3 text-sm">
+                  <div className="flex items-start gap-2.5">
+                    <CheckCircle2 size={18} className="text-[#D4AF37] shrink-0 mt-0.5" />
+                    <span>
+                      Partner notification routed to{' '}
+                      <strong className="text-white">{PARTNER_NOTIFICATION_EMAIL}</strong>
+                    </span>
                   </div>
-                )}
+                  <div className="flex items-start gap-2.5">
+                    <CheckCircle2 size={18} className="text-[#D4AF37] shrink-0 mt-0.5" />
+                    <span>
+                      Confirmation copy routed to{' '}
+                      <strong className="text-white">{quoteForm.email}</strong>
+                    </span>
+                  </div>
+                </div>
 
                 {logoFiles.length > 0 && (
                   <p className="text-white/80 text-sm mb-6">
@@ -1378,17 +1171,6 @@ export default function SoCalCustomCanopies() {
                   >
                     Submit Another Request
                   </button>
-                  {submissionResult?.spreadsheetUrl && (
-                    <a
-                      href={submissionResult.spreadsheetUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="py-3.5 px-6 rounded-md bg-white text-[#0A192F] hover:bg-gray-100 font-bold uppercase tracking-wider text-xs transition-colors inline-flex items-center justify-center gap-2 no-underline"
-                    >
-                      <FileSpreadsheet size={15} />
-                      <span>View Google Sheet</span>
-                    </a>
-                  )}
                   <a
                     href={SOCAL_WEBSITE_URL}
                     target="_blank"
@@ -1402,94 +1184,6 @@ export default function SoCalCustomCanopies() {
               </div>
             ) : (
               <form onSubmit={handleQuoteSubmit} className="space-y-6">
-                {/* Google Workspace Connection & Google Sheet Destination Bar */}
-                <div className="bg-[#f8f9fa] border border-gray-200 rounded-lg p-5 space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                      <div className="text-xs font-black uppercase tracking-wider text-[#0A192F] mb-1">
-                        Gmail &amp; Google Sheets Integration
-                      </div>
-                      <p className="text-xs sm:text-sm text-[#444444]">
-                        Emails <strong className="text-[#111111]">{PARTNER_NOTIFICATION_EMAIL}</strong>, sends a confirmation email to the submitter, and logs each entry to Google Sheets.
-                      </p>
-                    </div>
-
-                    <div className="shrink-0">
-                      {needsAuth || !googleUser ? (
-                        <GoogleSignInButton
-                          onClick={handleGoogleLogin}
-                          disabled={isLoggingIn}
-                          label={isLoggingIn ? 'Signing in...' : 'Sign in with Google'}
-                        />
-                      ) : (
-                        <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-md px-3.5 py-2">
-                          <CheckCircle2 size={16} className="text-green-700 shrink-0" />
-                          <div className="text-xs">
-                            <div className="font-bold text-[#111111] truncate max-w-[180px]">
-                              {googleUser.email}
-                            </div>
-                            <div className="text-[#666666]">Google Connected</div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={handleGoogleLogout}
-                            className="text-xs font-bold text-gray-500 hover:text-[#C8102E] p-1.5 rounded hover:bg-gray-100 transition-colors cursor-pointer border-none bg-transparent"
-                            title="Sign out of Google"
-                          >
-                            <LogOut size={14} />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Destination Google Sheet Configuration */}
-                  <div className="pt-3 border-t border-gray-200/80">
-                    <label
-                      htmlFor="google-sheet-destination"
-                      className="block text-xs font-bold uppercase tracking-wide text-[#333333] mb-1.5"
-                    >
-                      Destination Google Sheet URL or ID{' '}
-                      <span className="font-normal text-[#666666] normal-case">
-                        (Leave blank to automatically create &ldquo;PRSL Member Pricing Requests&rdquo;)
-                      </span>
-                    </label>
-                    <div className="flex flex-col sm:flex-row gap-2.5">
-                      <input
-                        id="google-sheet-destination"
-                        type="text"
-                        value={spreadsheetInput}
-                        onChange={(e) => {
-                          setSpreadsheetInput(e.target.value);
-                          localStorage.setItem(SHEET_ID_STORAGE_KEY, e.target.value);
-                        }}
-                        placeholder="Paste Google Sheet URL or Spreadsheet ID (optional)"
-                        className="flex-1 bg-white border border-gray-300 px-3.5 py-2.5 rounded-md text-sm text-[#111111] focus:ring-2 focus:ring-[#C8102E] outline-none"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleCreateNewSheet}
-                        disabled={isCreatingSheet}
-                        className="bg-[#0A192F] hover:bg-[#162d50] text-white font-bold uppercase tracking-wider text-xs px-4 py-2.5 rounded-md transition-colors inline-flex items-center justify-center gap-1.5 cursor-pointer border-none shrink-0"
-                      >
-                        <FileSpreadsheet size={15} />
-                        <span>{isCreatingSheet ? 'Creating...' : 'Create New Sheet'}</span>
-                      </button>
-                      {savedSheetUrl && (
-                        <a
-                          href={savedSheetUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="bg-white hover:bg-gray-100 text-[#0A192F] border border-gray-300 font-bold uppercase tracking-wider text-xs px-3.5 py-2.5 rounded-md transition-colors inline-flex items-center justify-center gap-1.5 no-underline shrink-0"
-                        >
-                          <span>Open Sheet</span>
-                          <ExternalLink size={13} />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
                 {submissionError && (
                   <div className="bg-red-50 border border-red-200 border-l-4 border-l-[#C8102E] rounded-md p-4 flex items-start gap-3">
                     <AlertCircle size={18} className="text-[#C8102E] shrink-0 mt-0.5" />
@@ -1880,134 +1574,6 @@ export default function SoCalCustomCanopies() {
           </div>
         </div>
       </section>
-
-      {/* ================================================================= */}
-      {/* USER CONFIRMATION DIALOG FOR GMAIL & GOOGLE SHEETS SUBMISSION     */}
-      {/* ================================================================= */}
-      <AnimatePresence>
-        {showConfirmSubmitModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => !isSubmitting && setShowConfirmSubmitModal(false)}
-            className="fixed inset-0 bg-black/75 z-[2000] flex items-center justify-center p-4 overflow-y-auto"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-xl border-t-4 border-t-[#C8102E] max-w-lg w-full overflow-hidden shadow-2xl"
-            >
-              <div className="bg-[#0A192F] text-white p-6 flex items-start justify-between">
-                <div>
-                  <div className="text-xs font-black uppercase tracking-widest text-[#D4AF37] mb-1">
-                    Confirm Google Workspace Actions
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-black uppercase text-white">
-                    Send Emails &amp; Save to Google Sheet?
-                  </h3>
-                </div>
-                <button
-                  type="button"
-                  disabled={isSubmitting}
-                  onClick={() => setShowConfirmSubmitModal(false)}
-                  className="text-white/70 hover:text-white bg-white/10 rounded-md p-2 cursor-pointer border-none"
-                  aria-label="Close confirmation dialog"
-                >
-                  <X size={18} />
-                </button>
-              </div>
-
-              <div className="p-6 space-y-5">
-                <p className="text-sm sm:text-base text-[#333333] leading-relaxed">
-                  Please confirm that you want to execute the following actions for{' '}
-                  <strong className="text-[#111111]">{quoteForm.clubOrganization}</strong>:
-                </p>
-
-                <ul className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3 text-sm text-[#222222] list-none">
-                  <li className="flex items-start gap-2.5">
-                    <span className="w-2 h-2 rounded-full bg-[#C8102E] mt-1.5 shrink-0" />
-                    <span>
-                      <strong>Send Quote Notification Email</strong> via Gmail to{' '}
-                      <span className="font-semibold text-[#0A192F]">
-                        {PARTNER_NOTIFICATION_EMAIL}
-                      </span>
-                      {logoFiles.length > 0 ? ` (with ${logoFiles.length} logo file${logoFiles.length > 1 ? 's' : ''})` : ''}
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <span className="w-2 h-2 rounded-full bg-[#C8102E] mt-1.5 shrink-0" />
-                    <span>
-                      <strong>Send Confirmation Email</strong> via Gmail to{' '}
-                      <span className="font-semibold text-[#0A192F]">{quoteForm.email}</span>
-                    </span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <span className="w-2 h-2 rounded-full bg-[#C8102E] mt-1.5 shrink-0" />
-                    <span>
-                      <strong>Insert Entry Row into Google Sheets</strong> (
-                      {spreadsheetInput.trim()
-                        ? 'Selected Google Sheet'
-                        : 'PRSL Member Pricing Requests — SoCal Custom Canopies'}
-                      )
-                    </span>
-                  </li>
-                </ul>
-
-                {needsAuth || !googleUser ? (
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="text-xs sm:text-sm text-amber-950 font-medium">
-                      Sign in with Google to authorize sending the emails and inserting the Google Sheet row:
-                    </div>
-                    <GoogleSignInButton
-                      onClick={handleGoogleLogin}
-                      disabled={isLoggingIn}
-                      label={isLoggingIn ? 'Signing in...' : 'Sign in with Google'}
-                    />
-                  </div>
-                ) : (
-                  <div className="text-xs text-[#555555] flex items-center justify-between bg-gray-100 px-3.5 py-2.5 rounded">
-                    <span>
-                      Signed in as <strong className="text-[#111111]">{googleUser.email}</strong>
-                    </span>
-                    <span className="text-green-700 font-bold uppercase">Ready</span>
-                  </div>
-                )}
-
-                {submissionError && (
-                  <div className="bg-red-50 border border-red-200 border-l-4 border-l-[#C8102E] rounded-md p-3.5 text-xs sm:text-sm text-[#991b1b] font-medium">
-                    {submissionError}
-                  </div>
-                )}
-
-                <div className="pt-3 border-t border-gray-200 flex flex-col-reverse sm:flex-row justify-end gap-3">
-                  <button
-                    type="button"
-                    disabled={isSubmitting}
-                    onClick={() => setShowConfirmSubmitModal(false)}
-                    className="px-5 py-3 rounded-md border border-gray-300 bg-white hover:bg-gray-100 text-[#333333] font-bold uppercase tracking-wider text-xs cursor-pointer transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    disabled={isSubmitting}
-                    onClick={executeConfirmedSubmission}
-                    className="btn-primary py-3 px-6 text-xs gap-2"
-                  >
-                    <span>
-                      {isSubmitting ? 'SENDING & SAVING...' : 'Confirm & Send Quote Request'}
-                    </span>
-                    <ArrowRight size={15} />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ================================================================= */}
       {/* PRODUCT LEARN MORE MODAL                                          */}
