@@ -29,7 +29,6 @@ const PARTNER_NOTIFICATION_EMAIL = "socalcustomcanopies@gmail.com";
 
 interface ProductCategory {
   id: string;
-  number: string;
   name: string;
   subtitle: string;
   description: string;
@@ -69,18 +68,13 @@ export default function SoCalCustomCanopies() {
     isPrslAffiliated: false
   });
   const [logoFiles, setLogoFiles] = useState<
-    { file: File; previewUrl: string | null; dataUrl?: string }[]
+    { file: File; previewUrl: string | null }[]
   >([]);
   const [isDraggingLogo, setIsDraggingLogo] = useState(false);
   const [logoUploadError, setLogoUploadError] = useState<string | null>(null);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
-  const [submissionResult, setSubmissionResult] = useState<{
-    emailConfigured: boolean;
-    vendorEmailSent: boolean;
-    confirmationEmailSent: boolean;
-  } | null>(null);
 
   useEffect(() => {
     if (formSubmitted) {
@@ -196,37 +190,29 @@ export default function SoCalCustomCanopies() {
     return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   };
 
-  const readFileAsDataUrl = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(file);
-    });
-
-  const handleLogoFilesSelected = async (fileList: FileList | null) => {
+  const handleLogoFilesSelected = (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return;
     setLogoUploadError(null);
 
     const maxBytes = 100 * 1024 * 1024; // 100 MB per file
-    const newEntries: { file: File; previewUrl: string | null; dataUrl?: string }[] = [];
+    const maxTotalFiles = 10;
+    const incomingFiles = Array.from(fileList);
 
-    for (const file of Array.from(fileList)) {
+    if (logoFiles.length + incomingFiles.length > maxTotalFiles) {
+      setLogoUploadError(`You can attach up to ${maxTotalFiles} logo files per request.`);
+      return;
+    }
+
+    const newEntries: { file: File; previewUrl: string | null }[] = [];
+
+    for (const file of incomingFiles) {
       if (file.size > maxBytes) {
         setLogoUploadError(`"${file.name}" exceeds the 100 MB file size limit.`);
         continue;
       }
       const isImage = file.type.startsWith('image/');
       const previewUrl = isImage ? URL.createObjectURL(file) : null;
-      let dataUrl: string | undefined;
-      if (file.size <= 15 * 1024 * 1024) {
-        try {
-          dataUrl = await readFileAsDataUrl(file);
-        } catch {
-          dataUrl = undefined;
-        }
-      }
-      newEntries.push({ file, previewUrl, dataUrl });
+      newEntries.push({ file, previewUrl });
     }
 
     if (newEntries.length > 0) {
@@ -253,22 +239,27 @@ export default function SoCalCustomCanopies() {
     setSubmissionError(null);
     setIsSubmitting(true);
 
-    const payload = {
-      ...quoteForm,
-      logos: logoFiles.map((item) => ({
-        name: item.file.name,
-        size: item.file.size,
-        type: item.file.type,
-        dataUrl: item.dataUrl
-      })),
-      submittedAt: new Date().toISOString()
-    };
-
     try {
+      const formData = new FormData();
+      formData.append('fullName', quoteForm.fullName.trim());
+      formData.append('clubOrganization', quoteForm.clubOrganization.trim());
+      formData.append('teamName', quoteForm.teamName.trim());
+      formData.append('email', quoteForm.email.trim());
+      formData.append('phone', quoteForm.phone.trim());
+      formData.append('selectedProducts', JSON.stringify(quoteForm.selectedProducts));
+      formData.append('quantityNeeded', quoteForm.quantityNeeded.trim());
+      formData.append('projectDetails', quoteForm.projectDetails.trim());
+      formData.append('preferredContactMethod', quoteForm.preferredContactMethod);
+      formData.append('isPrslAffiliated', String(quoteForm.isPrslAffiliated));
+      formData.append('submittedAt', new Date().toISOString());
+
+      for (const item of logoFiles) {
+        formData.append('logos', item.file, item.file.name);
+      }
+
       const response = await fetch('/api/quote-request', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: formData
       });
 
       const data = await response.json().catch(() => ({}));
@@ -279,11 +270,6 @@ export default function SoCalCustomCanopies() {
         );
       }
 
-      setSubmissionResult({
-        emailConfigured: Boolean(data.emailConfigured),
-        vendorEmailSent: Boolean(data.vendorEmailSent),
-        confirmationEmailSent: Boolean(data.confirmationEmailSent)
-      });
       setFormSubmitted(true);
     } catch (err) {
       console.error('Quote submission error:', err);
@@ -346,7 +332,6 @@ export default function SoCalCustomCanopies() {
   const productCategories: ProductCategory[] = [
     {
       id: 'custom-canopies',
-      number: '01',
       name: 'Custom Canopies',
       subtitle: '10×10 • 10×15 • 10×20 • Full & Half Walls',
       description:
@@ -361,7 +346,6 @@ export default function SoCalCustomCanopies() {
     },
     {
       id: 'table-covers',
-      number: '02',
       name: 'Table Covers',
       subtitle: '6ft & 8ft • Stretch, Fitted & Draped',
       description:
@@ -376,7 +360,6 @@ export default function SoCalCustomCanopies() {
     },
     {
       id: 'custom-flags',
-      number: '03',
       name: 'Custom Flags',
       subtitle: 'Feather & Teardrop • Single & Double-Sided',
       description:
@@ -391,7 +374,6 @@ export default function SoCalCustomCanopies() {
     },
     {
       id: 'banners-signs',
-      number: '04',
       name: 'Banners & Signs',
       subtitle: 'Vinyl • Mesh • A-Frames • Field Signage',
       description:
@@ -406,7 +388,6 @@ export default function SoCalCustomCanopies() {
     },
     {
       id: 'custom-backdrops',
-      number: '05',
       name: 'Custom Backdrops',
       subtitle: 'Step-and-Repeat • Media Walls • Awards',
       description:
@@ -421,7 +402,6 @@ export default function SoCalCustomCanopies() {
     },
     {
       id: 'custom-printing',
-      number: '06',
       name: 'Custom Printing & More',
       subtitle: 'Coordinated Team & Club Branding Packages',
       description:
@@ -1162,7 +1142,6 @@ export default function SoCalCustomCanopies() {
                       setLogoFiles([]);
                       setLogoUploadError(null);
                       setSubmissionError(null);
-                      setSubmissionResult(null);
                       setFormSubmitted(false);
                       setQuoteForm({
                         fullName: '',
