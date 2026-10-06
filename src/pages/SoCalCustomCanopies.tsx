@@ -82,6 +82,17 @@ export default function SoCalCustomCanopies() {
     confirmationEmailSent: boolean;
   } | null>(null);
 
+  useEffect(() => {
+    if (formSubmitted) {
+      requestAnimationFrame(() => {
+        const thankYouEl = document.getElementById('quote-thank-you');
+        if (thankYouEl) {
+          thankYouEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+    }
+  }, [formSubmitted]);
+
   // Set SEO Page Title, Meta Description, and OpenGraph tags
   useEffect(() => {
     const previousTitle = document.title;
@@ -865,20 +876,12 @@ export default function SoCalCustomCanopies() {
                 <div>
                   {/* Clean, Easy-to-Read Product Visual Area (Navy, Red, White, Subtle Gold) */}
                   <div className="bg-[#0A192F] text-white p-6 border-b-4 border-[#C8102E] min-h-[175px] flex flex-col justify-between relative overflow-hidden">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <img
-                          src={SOCAL_LOGO_URL}
-                          alt="SoCal Custom Canopies Logo"
-                          className="h-9 w-9 object-contain rounded border border-[#D4AF37]/40 bg-black"
-                        />
-                        <span className="text-xs font-black uppercase tracking-widest text-[#D4AF37]">
-                          PRSL PARTNER GEAR
-                        </span>
-                      </div>
-                      <span className="text-sm font-black text-white/40">
-                        {product.number}
-                      </span>
+                    <div className="flex items-center">
+                      <img
+                        src={SOCAL_LOGO_URL}
+                        alt="SoCal Custom Canopies Logo"
+                        className="h-9 w-9 object-contain rounded border border-[#D4AF37]/40 bg-black"
+                      />
                     </div>
 
                     <div className="my-3">
@@ -1106,17 +1109,24 @@ export default function SoCalCustomCanopies() {
             </div>
 
             {formSubmitted ? (
-              <div className="bg-[#0A192F] text-white rounded-xl p-8 sm:p-10 border-l-8 border-l-[#C8102E]">
-                <h3 className="text-2xl sm:text-3xl font-black uppercase text-white mb-3">
+              <div
+                id="quote-thank-you"
+                className="bg-[#0A192F] text-white rounded-xl p-8 sm:p-12 border-t-8 border-t-[#C8102E] text-center flex flex-col items-center shadow-xl"
+              >
+                <div className="w-16 h-16 rounded-full bg-[#C8102E] text-white flex items-center justify-center mb-5 shadow-md">
+                  <CheckCircle2 size={34} />
+                </div>
+
+                <h3 className="text-2xl sm:text-3xl font-black uppercase text-white mb-3 max-w-2xl">
                   Thank you! Your PRSL member pricing request has been received.
                 </h3>
-                <p className="text-white/90 text-base leading-relaxed mb-5">
+                <p className="text-white/90 text-base sm:text-lg leading-relaxed mb-6 max-w-xl">
                   We have recorded your inquiry for{' '}
                   <strong className="text-[#D4AF37]">{quoteForm.clubOrganization}</strong>
                   {quoteForm.teamName ? ` (${quoteForm.teamName})` : ''}.
                 </p>
 
-                <div className="bg-white/10 border border-white/15 rounded-lg p-5 mb-6 space-y-3 text-sm">
+                <div className="bg-white/10 border border-white/15 rounded-lg p-5 mb-6 space-y-3 text-sm w-full max-w-lg text-left">
                   <div className="flex items-start gap-2.5">
                     <CheckCircle2 size={18} className="text-[#D4AF37] shrink-0 mt-0.5" />
                     <span>
@@ -1134,7 +1144,7 @@ export default function SoCalCustomCanopies() {
                 </div>
 
                 {logoFiles.length > 0 && (
-                  <p className="text-white/80 text-sm mb-6">
+                  <p className="text-white/80 text-sm mb-6 max-w-lg">
                     Attached Logo / Artwork Files ({logoFiles.length}):{' '}
                     <span className="font-semibold text-white">
                       {logoFiles.map((f) => f.file.name).join(', ')}
@@ -1142,7 +1152,7 @@ export default function SoCalCustomCanopies() {
                   </p>
                 )}
 
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4 border-t border-white/15">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 pt-6 border-t border-white/15 w-full max-w-lg">
                   <button
                     type="button"
                     onClick={() => {
