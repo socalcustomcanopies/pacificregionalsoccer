@@ -1,0 +1,17 @@
+{
+  "rules": [
+    {
+      "id": "Auto-delete-quote-artwork-after-14-days",
+      "enabled": true,
+      "conditions": {
+        "prefix": "quotes/"
+      },
+      "deleteObjectsTransition": {
+        "condition": {
+          "maxAge": 1209600,
+          "type": "Age"
+        }
+      }
+    }
+  ]
+}

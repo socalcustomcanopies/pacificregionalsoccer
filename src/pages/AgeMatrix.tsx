@@ -267,6 +267,9 @@ export default function AgeMatrix() {
               alt="Age Matrix Flyer 2" 
               className="w-full rounded-xl border border-white/10 shadow-2xl cursor-zoom-in hover:scale-[1.01] transition-transform"
               onClick={() => setSelectedImg("https://media.pacificregionalsoccer.com/age-matrix-flyer-2.png?v=2")}
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
             />
 
             <motion.div 
