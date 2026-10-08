@@ -2,8 +2,8 @@
  * Cloudflare Worker Backend for Pacific Regional Soccer League (PRSL)
  * Handles:
  *  - GET  /api/health
- *  - POST /api/contact           (PRSL Home Page General Contact Form via PRSL Gmail OAuth2 REST API)
- *  - POST /api/quote-request     (SoCal Custom Canopies Quote Request Form via SoCal Gmail OAuth2 REST API + Private R2 Storage)
+ *  - POST /api/contact           (PRSL Home Page General Contact Form via Resend REST API)
+ *  - POST /api/quote-request     (SoCal Custom Canopies Quote Request Form via Resend REST API + Private R2 Storage)
  *  - GET  /api/quote-files/*     (Private, HMAC-signed expiring download route for R2 quote artwork files)
  *  - Static SPA Assets fallback via env.ASSETS
  *  - Scheduled Cron handler for automatic 14-day R2 temporary file cleanup
@@ -59,26 +59,12 @@ export interface WorkerEnv {
   // Static Assets binding (automatically injected by Cloudflare Workers Static Assets)
   ASSETS?: FetcherBinding;
 
+  // Resend REST API Key (Cloudflare Worker secret)
+  RESEND_API_KEY?: string;
+
   // Private R2 Bucket binding for SoCal Custom Canopies quote artwork uploads
   QUOTE_UPLOADS_BUCKET?: R2BucketBinding;
   R2_DOWNLOAD_SIGNING_SECRET?: string;
-
-  // Shared Google OAuth2 Client credentials (can also be overridden per account)
-  GMAIL_OAUTH_CLIENT_ID?: string;
-  GMAIL_OAUTH_CLIENT_SECRET?: string;
-
-  // 1. PRSL Home Page Contact Form (/api/contact) — Dedicated Gmail OAuth2 credentials
-  PRSL_GMAIL_USER?: string;
-  PRSL_GMAIL_REFRESH_TOKEN?: string;
-  PRSL_GMAIL_CLIENT_ID?: string;
-  PRSL_GMAIL_CLIENT_SECRET?: string;
-
-  // 2. SoCal Custom Canopies Quote Form (/api/quote-request) — Dedicated Gmail OAuth2 credentials
-  GMAIL_USER?: string;
-  SOCAL_GMAIL_REFRESH_TOKEN?: string;
-  GMAIL_REFRESH_TOKEN?: string;
-  SOCAL_GMAIL_CLIENT_ID?: string;
-  SOCAL_GMAIL_CLIENT_SECRET?: string;
 }
 
 export interface ExecutionContextLike {
@@ -91,9 +77,11 @@ export interface ScheduledControllerLike {
   cron: string;
 }
 
-// Email Constants (Strictly Preserved)
+// Verified Resend Sender & Email Recipients (Strictly Enforced)
+const RESEND_API_URL = 'https://api.resend.com/emails';
+const VERIFIED_FROM_EMAIL = 'notifications@pacificregionalsoccer.com';
+
 const PRSL_CONTACT_FROM_NAME = 'Pacific Regional Soccer League';
-const PRSL_CONTACT_FROM_EMAIL = 'pacificregionalsoccerleague@gmail.com';
 const PRSL_CONTACT_TO_EMAIL = 'pacificregionalsoccerleague@gmail.com';
 const PRSL_CONTACT_CC_EMAIL = 'pacificregionalsl@gmail.com';
 
@@ -106,7 +94,7 @@ const CONTACT_MAX_BODY_BYTES = 64 * 1024; // 64 KB max payload for /api/contact
 const QUOTE_MAX_FILES = 10;
 const QUOTE_MAX_SINGLE_FILE_BYTES = 25 * 1024 * 1024; // 25 MB per file (safe for 128 MB Worker memory)
 const QUOTE_MAX_TOTAL_FILES_BYTES = 50 * 1024 * 1024; // 50 MB total per request
-const DIRECT_EMAIL_ATTACHMENT_MAX_BYTES = 12 * 1024 * 1024; // Attach directly in MIME when total <= 12 MB
+const DIRECT_EMAIL_ATTACHMENT_MAX_BYTES = 12 * 1024 * 1024; // Attach directly via Resend when total <= 12 MB
 const R2_RETENTION_DAYS = 14;
 const R2_RETENTION_MS = R2_RETENTION_DAYS * 24 * 60 * 60 * 1000;
 
@@ -144,12 +132,6 @@ const QUOTE_RATE_LIMIT_MAX = 8;
 const contactRateMap = new Map<string, { count: number; windowStart: number }>();
 const quoteRateMap = new Map<string, { count: number; windowStart: number }>();
 
-// In-Memory OAuth2 Access Token Cache (Keyed by account email)
-const oauthTokenCache = new Map<
-  string,
-  { accessToken: string; expiresAtMs: number; verifiedEmail: string }
->();
-
 function checkRateLimit(
   map: Map<string, { count: number; windowStart: number }>,
   clientIp: string,
@@ -174,6 +156,63 @@ function getClientIp(request: Request): string {
   const xff = request.headers.get('x-forwarded-for');
   if (xff && xff.trim()) return xff.split(',')[0].trim();
   return 'unknown';
+}
+
+// --- CORS & Origin Validation Helpers ---
+
+function isAllowedOrigin(originHeader: string | null, requestUrl: URL, env: WorkerEnv): boolean {
+  if (!originHeader) return true; // Same-origin requests without Origin header
+  try {
+    const parsedOrigin = new URL(originHeader);
+    if (parsedOrigin.origin === requestUrl.origin) return true;
+    if (
+      parsedOrigin.hostname === 'pacificregionalsoccer.com' ||
+      parsedOrigin.hostname === 'www.pacificregionalsoccer.com' ||
+      parsedOrigin.hostname.endsWith('.workers.dev')
+    ) {
+      return true;
+    }
+    if (env.APP_URL) {
+      const configuredOrigin = new URL(env.APP_URL).origin;
+      if (parsedOrigin.origin === configuredOrigin) return true;
+    }
+    if (
+      env.ENVIRONMENT !== 'production' &&
+      (parsedOrigin.hostname === 'localhost' || parsedOrigin.hostname === '127.0.0.1')
+    ) {
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+function getCorsHeaders(request: Request, requestUrl: URL, env: WorkerEnv): Record<string, string> {
+  const originHeader = request.headers.get('Origin');
+  const headers: Record<string, string> = {
+    Vary: 'Origin',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Accept'
+  };
+  if (originHeader && isAllowedOrigin(originHeader, requestUrl, env)) {
+    headers['Access-Control-Allow-Origin'] = originHeader;
+  }
+  return headers;
+}
+
+function jsonWithCors(
+  data: unknown,
+  status: number,
+  request: Request,
+  requestUrl: URL,
+  env: WorkerEnv
+): Response {
+  const corsHeaders = getCorsHeaders(request, requestUrl, env);
+  return Response.json(data, {
+    status,
+    headers: corsHeaders
+  });
 }
 
 function escapeHtml(value: string): string {
@@ -273,7 +312,7 @@ async function createSignedR2DownloadUrl(
   return `${origin}/api/quote-files/${encodedKey}?exp=${expSeconds}&sig=${sig}`;
 }
 
-// --- Base64 & RFC 2822 MIME Email Builder for Gmail REST API ---
+// --- Base64 Helper & Resend REST API Email Sender ---
 
 function bytesToBase64(bytes: Uint8Array): string {
   let binary = '';
@@ -285,225 +324,92 @@ function bytesToBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
-function utf8ToBase64(text: string): string {
-  return bytesToBase64(new TextEncoder().encode(text));
-}
-
-function utf8ToBase64Url(text: string): string {
-  return utf8ToBase64(text).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
-function wrapBase64Lines(base64Str: string, lineLength = 76): string {
-  const lines: string[] = [];
-  for (let i = 0; i < base64Str.length; i += lineLength) {
-    lines.push(base64Str.slice(i, i + lineLength));
-  }
-  return lines.join('\r\n');
-}
-
-function encodeMimeHeaderUtf8(value: string): string {
-  const clean = sanitizeSingleLine(value);
-  if (/^[\x20-\x7E]*$/.test(clean)) {
-    return clean;
-  }
-  return `=?UTF-8?B?${utf8ToBase64(clean)}?=`;
-}
-
-interface MimeAttachment {
+interface ResendAttachmentPayload {
   filename: string;
-  contentType: string;
-  contentBytes: Uint8Array;
+  content: string; // base64 encoded content
+  content_type?: string;
 }
 
-interface MimeMessageOptions {
+interface ResendEmailOptions {
   fromName: string;
   fromEmail: string;
-  to: string;
-  cc?: string;
-  replyTo?: string;
+  to: string | string[];
+  cc?: string | string[];
+  replyTo?: string | string[];
   subject: string;
   text?: string;
   html: string;
-  attachments?: MimeAttachment[];
+  attachments?: ResendAttachmentPayload[];
 }
 
-function buildRawMimeMessage(options: MimeMessageOptions): string {
-  const mixedBoundary = `----=_Part_Mixed_${crypto.randomUUID().replace(/-/g, '')}`;
-  const altBoundary = `----=_Part_Alt_${crypto.randomUUID().replace(/-/g, '')}`;
+async function sendEmailViaResend(
+  apiKey: string,
+  options: ResendEmailOptions
+): Promise<{ id: string }> {
+  const safeFromName = sanitizeSingleLine(options.fromName).replace(/"/g, '\\"');
+  const safeFromEmail = sanitizeSingleLine(options.fromEmail);
 
-  const escapedFromName = options.fromName.replace(/"/g, '\\"');
-  const headers: string[] = [
-    `From: "${escapedFromName}" <${ sanitizeSingleLine(options.fromEmail) }>`,
-    `To: ${sanitizeSingleLine(options.to)}`
-  ];
+  const payload: Record<string, unknown> = {
+    from: `${safeFromName} <${safeFromEmail}>`,
+    to: Array.isArray(options.to) ? options.to : [sanitizeSingleLine(options.to)],
+    subject: sanitizeSingleLine(options.subject),
+    html: options.html
+  };
 
   if (options.cc) {
-    headers.push(`Cc: ${sanitizeSingleLine(options.cc)}`);
+    payload.cc = Array.isArray(options.cc) ? options.cc : [sanitizeSingleLine(options.cc)];
   }
+
   if (options.replyTo) {
-    headers.push(`Reply-To: ${sanitizeSingleLine(options.replyTo)}`);
+    payload.reply_to = Array.isArray(options.replyTo)
+      ? options.replyTo
+      : sanitizeSingleLine(options.replyTo);
   }
 
-  headers.push(`Subject: ${encodeMimeHeaderUtf8(options.subject)}`);
-  headers.push('MIME-Version: 1.0');
-
-  const hasAttachments = Array.isArray(options.attachments) && options.attachments.length > 0;
-
-  const textPart = options.text
-    ? [
-        `--${altBoundary}`,
-        'Content-Type: text/plain; charset="UTF-8"',
-        'Content-Transfer-Encoding: base64',
-        '',
-        wrapBase64Lines(utf8ToBase64(options.text))
-      ].join('\r\n')
-    : '';
-
-  const htmlPart = [
-    `--${altBoundary}`,
-    'Content-Type: text/html; charset="UTF-8"',
-    'Content-Transfer-Encoding: base64',
-    '',
-    wrapBase64Lines(utf8ToBase64(options.html)),
-    `--${altBoundary}--`
-  ].join('\r\n');
-
-  if (!hasAttachments) {
-    headers.push(`Content-Type: multipart/alternative; boundary="${altBoundary}"`);
-    return [headers.join('\r\n'), '', textPart, htmlPart].filter(Boolean).join('\r\n');
+  if (options.text) {
+    payload.text = options.text;
   }
 
-  headers.push(`Content-Type: multipart/mixed; boundary="${mixedBoundary}"`);
-  const bodySections: string[] = [
-    `--${mixedBoundary}`,
-    `Content-Type: multipart/alternative; boundary="${altBoundary}"`,
-    '',
-    textPart,
-    htmlPart
-  ].filter(Boolean);
-
-  for (const att of options.attachments!) {
-    const safeFilename = sanitizeSingleLine(att.filename).replace(/"/g, '');
-    const contentType = sanitizeSingleLine(att.contentType || 'application/octet-stream');
-    bodySections.push(
-      [
-        `--${mixedBoundary}`,
-        `Content-Type: ${contentType}; name="${safeFilename}"`,
-        'Content-Transfer-Encoding: base64',
-        `Content-Disposition: attachment; filename="${safeFilename}"`,
-        '',
-        wrapBase64Lines(bytesToBase64(att.contentBytes))
-      ].join('\r\n')
-    );
+  if (Array.isArray(options.attachments) && options.attachments.length > 0) {
+    payload.attachments = options.attachments;
   }
 
-  bodySections.push(`--${mixedBoundary}--`);
-  return [headers.join('\r\n'), '', ...bodySections].join('\r\n');
-}
-
-// --- Google OAuth2 Token Exchange & Gmail REST API Sender ---
-
-interface GmailOAuthAccountConfig {
-  expectedEmail: string;
-  clientId: string;
-  clientSecret: string;
-  refreshToken: string;
-}
-
-async function getGmailAccessToken(
-  config: GmailOAuthAccountConfig,
-  forceRefresh = false
-): Promise<string> {
-  const cacheKey = config.expectedEmail.toLowerCase();
-  const now = Date.now();
-  const cached = oauthTokenCache.get(cacheKey);
-
-  if (!forceRefresh && cached && cached.expiresAtMs - now > 60_000) {
-    return cached.accessToken;
-  }
-
-  const tokenParams = new URLSearchParams({
-    client_id: config.clientId,
-    client_secret: config.clientSecret,
-    refresh_token: config.refreshToken,
-    grant_type: 'refresh_token'
-  });
-
-  const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+  const res = await fetch(RESEND_API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: tokenParams.toString()
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
   });
-
-  if (!tokenRes.ok) {
-    let errorReason = `HTTP ${tokenRes.status}`;
-    try {
-      const errData = (await tokenRes.json()) as { error?: string; error_description?: string };
-      errorReason = errData.error_description || errData.error || errorReason;
-    } catch {
-      // Ignore JSON parse errors
-    }
-    throw new Error(`Gmail OAuth2 token refresh failed for ${config.expectedEmail}: ${errorReason}`);
-  }
-
-  const tokenData = (await tokenRes.json()) as {
-    access_token?: string;
-    expires_in?: number;
-  };
-
-  if (!tokenData.access_token) {
-    throw new Error(`Gmail OAuth2 response did not include an access_token for ${config.expectedEmail}.`);
-  }
-
-  const expiresInMs = Math.max((Number(tokenData.expires_in) || 3600) * 1000, 120_000);
-  oauthTokenCache.set(cacheKey, {
-    accessToken: tokenData.access_token,
-    expiresAtMs: now + expiresInMs,
-    verifiedEmail: config.expectedEmail.toLowerCase()
-  });
-
-  return tokenData.access_token;
-}
-
-async function sendEmailViaGmailRestApi(
-  accountConfig: GmailOAuthAccountConfig,
-  mimeOptions: MimeMessageOptions
-): Promise<{ id: string; threadId?: string }> {
-  const rawMime = buildRawMimeMessage(mimeOptions);
-  const encodedMessage = utf8ToBase64Url(rawMime);
-
-  const attemptSend = async (forceTokenRefresh: boolean) => {
-    const accessToken = await getGmailAccessToken(accountConfig, forceTokenRefresh);
-    return fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ raw: encodedMessage })
-    });
-  };
-
-  let res = await attemptSend(false);
-  if (res.status === 401) {
-    // Handle unexpected access token expiration safely by forcing a single refresh
-    res = await attemptSend(true);
-  }
 
   if (!res.ok) {
     let errorDetail = `HTTP ${res.status}`;
     try {
-      const errJson = (await res.json()) as { error?: { message?: string } };
-      if (errJson?.error?.message) {
+      const errJson = (await res.json()) as {
+        message?: string;
+        name?: string;
+        error?: string | { message?: string };
+      };
+      if (typeof errJson?.message === 'string' && errJson.message) {
+        errorDetail = errJson.message;
+      } else if (typeof errJson?.error === 'string' && errJson.error) {
+        errorDetail = errJson.error;
+      } else if (typeof errJson?.error === 'object' && errJson?.error?.message) {
         errorDetail = errJson.error.message;
       }
     } catch {
-      // Ignore parse errors
+      // Ignore JSON parse errors
     }
-    throw new Error(`Gmail API send failed (${accountConfig.expectedEmail}): ${errorDetail}`);
+    throw new Error(`Resend API delivery failed: ${errorDetail}`);
   }
 
-  return (await res.json()) as { id: string; threadId?: string };
+  const data = (await res.json()) as { id?: string };
+  if (!data?.id) {
+    throw new Error('Resend API did not return a valid email delivery ID.');
+  }
+
+  return { id: data.id };
 }
 
 // --- Email Template Builders ---
@@ -631,8 +537,8 @@ function buildContactEmailTemplates(payload: ContactFormPayload) {
           </div>
           <p style="margin: 4px 0; font-size: 14px;"><strong>Name:</strong> ${escapeHtml(safeName)}</p>
           <p style="margin: 4px 0; font-size: 14px;"><strong>Email:</strong> ${escapeHtml(payload.email)}</p>
-          ${payload.phone ? `<p style="margin: 4px 0; font-size: 14px;"><strong>Phone:</strong> ${escapeHtml( safePhone )}</p>` : ''}
-          ${payload.subject ? `<p style="margin: 4px 0; font-size: 14px;"><strong>Subject:</strong> ${escapeHtml( safeSubject )}</p>` : ''}
+          ${payload.phone ? `<p style="margin: 4px 0; font-size: 14px;"><strong>Phone:</strong> ${escapeHtml(safePhone)}</p>` : ''}
+          ${payload.subject ? `<p style="margin: 4px 0; font-size: 14px;"><strong>Subject:</strong> ${escapeHtml(safeSubject)}</p>` : ''}
           <p style="margin: 4px 0; font-size: 14px;"><strong>Submitted:</strong> ${escapeHtml(submittedDateFormatted)}</p>
           <p style="margin: 10px 0 4px 0; font-size: 14px;"><strong>Message:</strong></p>
           <div style="font-size: 14px; color: #333333; white-space: pre-wrap; line-height: 1.5;">${escapeHtml(payload.message)}</div>
@@ -716,6 +622,33 @@ function buildQuoteEmailTemplates(payload: QuoteRequestPayload) {
     payload.teamName ? ` (${payload.teamName})` : ''
   }`;
 
+  const vendorText = [
+    'New PRSL Member Pricing Request — SoCal Custom Canopies',
+    '-------------------------------------------------------',
+    `Submitted: ${submittedDateFormatted}`,
+    `Full Name: ${payload.fullName}`,
+    `Club / Organization: ${payload.clubOrganization}`,
+    `Team Name / Age Group: ${payload.teamName || 'N/A'}`,
+    `Email Address: ${payload.email}`,
+    `Phone Number: ${payload.phone}`,
+    `Preferred Contact: ${payload.preferredContactMethod}`,
+    'PRSL Affiliation: Confirmed PRSL Member Club / Team',
+    `Selected Products: ${productsText}`,
+    `Estimated Quantity: ${payload.quantityNeeded || 'Not specified'}`,
+    `Project Details: ${payload.projectDetails || 'None provided'}`,
+    `Uploaded Artwork: ${
+      logos.length > 0
+        ? logos
+            .map((l) =>
+              l.signedDownloadUrl
+                ? `${l.name} (${formatBytes(l.size)}) - ${l.signedDownloadUrl}`
+                : `${l.name} (${formatBytes(l.size)})`
+            )
+            .join('\n  ')
+        : 'No logo files attached'
+    }`
+  ].join('\n');
+
   const vendorHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; border: 1px solid #e5e7eb; border-top: 5px solid #C8102E; border-radius: 8px; overflow: hidden;">
       <div style="background-color: #0A192F; color: #ffffff; padding: 24px;">
@@ -782,6 +715,21 @@ function buildQuoteEmailTemplates(payload: QuoteRequestPayload) {
 
   const confirmationSubject = `Your PRSL Member Pricing Request – SoCal Custom Canopies & Print`;
 
+  const confirmationText = [
+    `Hi ${payload.fullName},`,
+    '',
+    `Thank you for submitting your Pacific Regional Soccer League (PRSL) Member Pricing request with SoCal Custom Canopies & Print. A representative will review your club details and artwork and follow up with you via ${payload.preferredContactMethod}.`,
+    '',
+    'Request Summary:',
+    `Club / Organization: ${payload.clubOrganization}`,
+    ...(payload.teamName ? [`Team Name: ${payload.teamName}`] : []),
+    `Selected Items: ${productsText}`,
+    `Quantity Needed: ${payload.quantityNeeded || 'Not specified'}`,
+    `Artwork Files: ${logosText}`,
+    '',
+    `Questions or additional files? Reply directly to this email (${PARTNER_NOTIFICATION_EMAIL}) or call 714-717-3264.`
+  ].join('\n');
+
   const confirmationHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; border: 1px solid #e5e7eb; border-top: 5px solid #0A192F; border-radius: 8px; overflow: hidden;">
       <div style="background-color: #0A192F; color: #ffffff; padding: 24px;">
@@ -818,49 +766,74 @@ function buildQuoteEmailTemplates(payload: QuoteRequestPayload) {
 
   return {
     vendorSubject,
+    vendorText,
     vendorHtml,
     confirmationSubject,
+    confirmationText,
     confirmationHtml
   };
 }
 
 // --- Route Handlers ---
 
-function handleHealth(env: WorkerEnv): Response {
-  const prslClientId = env.PRSL_GMAIL_CLIENT_ID || env.GMAIL_OAUTH_CLIENT_ID;
-  const prslClientSecret = env.PRSL_GMAIL_CLIENT_SECRET || env.GMAIL_OAUTH_CLIENT_SECRET;
-  const prslRefreshToken = env.PRSL_GMAIL_REFRESH_TOKEN;
+function handleHealth(request: Request, requestUrl: URL, env: WorkerEnv): Response {
+  const resendConfigured = Boolean(env.RESEND_API_KEY && String(env.RESEND_API_KEY).trim());
 
-  const socalClientId = env.SOCAL_GMAIL_CLIENT_ID || env.GMAIL_OAUTH_CLIENT_ID;
-  const socalClientSecret = env.SOCAL_GMAIL_CLIENT_SECRET || env.GMAIL_OAUTH_CLIENT_SECRET;
-  const socalRefreshToken = env.SOCAL_GMAIL_REFRESH_TOKEN || env.GMAIL_REFRESH_TOKEN;
-
-  return Response.json({
-    status: 'ok',
-    runtime: 'cloudflare-workers',
-    environment: env.ENVIRONMENT || 'production',
-    prslContactOAuthConfigured: Boolean(prslClientId && prslClientSecret && prslRefreshToken),
-    socalQuoteOAuthConfigured: Boolean(socalClientId && socalClientSecret && socalRefreshToken),
-    r2BucketConfigured: Boolean(env.QUOTE_UPLOADS_BUCKET),
-    r2SigningSecretConfigured: Boolean(env.R2_DOWNLOAD_SIGNING_SECRET)
-  });
+  return jsonWithCors(
+    {
+      status: 'ok',
+      ok: true,
+      runtime: 'cloudflare-workers',
+      environment: env.ENVIRONMENT || 'production',
+      emailProvider: 'resend',
+      fromAddress: VERIFIED_FROM_EMAIL,
+      resendConfigured,
+      r2BucketConfigured: Boolean(env.QUOTE_UPLOADS_BUCKET),
+      r2SigningSecretConfigured: Boolean(env.R2_DOWNLOAD_SIGNING_SECRET)
+    },
+    200,
+    request,
+    requestUrl,
+    env
+  );
 }
 
-async function handleContactPost(request: Request, env: WorkerEnv): Promise<Response> {
+async function handleContactPost(
+  request: Request,
+  requestUrl: URL,
+  env: WorkerEnv
+): Promise<Response> {
   try {
+    const originHeader = request.headers.get('Origin');
+    if (originHeader && !isAllowedOrigin(originHeader, requestUrl, env)) {
+      return jsonWithCors(
+        { ok: false, error: 'Cross-origin request not permitted.' },
+        403,
+        request,
+        requestUrl,
+        env
+      );
+    }
+
     const contentLength = Number(request.headers.get('content-length') || 0);
     if (contentLength > CONTACT_MAX_BODY_BYTES) {
-      return Response.json(
+      return jsonWithCors(
         { ok: false, error: 'Request payload exceeds the 64KB size limit.' },
-        { status: 413 }
+        413,
+        request,
+        requestUrl,
+        env
       );
     }
 
     const rawText = await request.text();
     if (new TextEncoder().encode(rawText).byteLength > CONTACT_MAX_BODY_BYTES) {
-      return Response.json(
+      return jsonWithCors(
         { ok: false, error: 'Request payload exceeds the 64KB size limit.' },
-        { status: 413 }
+        413,
+        request,
+        requestUrl,
+        env
       );
     }
 
@@ -868,24 +841,40 @@ async function handleContactPost(request: Request, env: WorkerEnv): Promise<Resp
     try {
       body = JSON.parse(rawText) as Record<string, unknown>;
     } catch {
-      return Response.json({ ok: false, error: 'Invalid JSON request payload.' }, { status: 400 });
+      return jsonWithCors(
+        { ok: false, error: 'Invalid JSON request payload.' },
+        400,
+        request,
+        requestUrl,
+        env
+      );
     }
 
     const clientIp = getClientIp(request);
     if (!checkRateLimit(contactRateMap, clientIp, CONTACT_RATE_LIMIT_MAX)) {
-      return Response.json(
+      return jsonWithCors(
         {
           ok: false,
-          error: 'Too many contact submissions from this address. Please wait a few minutes and try again.'
+          error:
+            'Too many contact submissions from this address. Please wait a few minutes and try again.'
         },
-        { status: 429 }
+        429,
+        request,
+        requestUrl,
+        env
       );
     }
 
     // Honeypot check
     const honeypot = String(body.website || body._gotcha || body.honeypot || '').trim();
     if (honeypot.length > 0) {
-      return Response.json({ ok: false, error: 'Spam submission detected.' }, { status: 400 });
+      return jsonWithCors(
+        { ok: false, error: 'Spam submission detected.' },
+        400,
+        request,
+        requestUrl,
+        env
+      );
     }
 
     const name = sanitizeSingleLine(String(body.name || ''));
@@ -895,82 +884,80 @@ async function handleContactPost(request: Request, env: WorkerEnv): Promise<Resp
     const message = String(body.message || '').trim();
 
     if (!name || !email || !message) {
-      return Response.json(
+      return jsonWithCors(
         { ok: false, error: 'Please provide your name, email address, and message.' },
-        { status: 400 }
+        400,
+        request,
+        requestUrl,
+        env
       );
     }
 
     if (name.length > 120) {
-      return Response.json(
+      return jsonWithCors(
         { ok: false, error: 'Name must be 120 characters or fewer.' },
-        { status: 400 }
+        400,
+        request,
+        requestUrl,
+        env
       );
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (email.length > 254 || !emailRegex.test(email)) {
-      return Response.json(
+      return jsonWithCors(
         { ok: false, error: 'Please provide a valid email address.' },
-        { status: 400 }
+        400,
+        request,
+        requestUrl,
+        env
       );
     }
 
     if (phone.length > 40) {
-      return Response.json(
+      return jsonWithCors(
         { ok: false, error: 'Phone number must be 40 characters or fewer.' },
-        { status: 400 }
+        400,
+        request,
+        requestUrl,
+        env
       );
     }
 
     if (subject.length > 200) {
-      return Response.json(
+      return jsonWithCors(
         { ok: false, error: 'Subject must be 200 characters or fewer.' },
-        { status: 400 }
+        400,
+        request,
+        requestUrl,
+        env
       );
     }
 
     if (message.length < 2 || message.length > 5000) {
-      return Response.json(
+      return jsonWithCors(
         { ok: false, error: 'Message must be between 2 and 5,000 characters.' },
-        { status: 400 }
+        400,
+        request,
+        requestUrl,
+        env
       );
     }
 
-    const prslUser = String(env.PRSL_GMAIL_USER || PRSL_CONTACT_FROM_EMAIL).trim();
-    const prslClientId = String(env.PRSL_GMAIL_CLIENT_ID || env.GMAIL_OAUTH_CLIENT_ID || '').trim();
-    const prslClientSecret = String(
-      env.PRSL_GMAIL_CLIENT_SECRET || env.GMAIL_OAUTH_CLIENT_SECRET || ''
-    ).trim();
-    const prslRefreshToken = String(env.PRSL_GMAIL_REFRESH_TOKEN || '').trim();
-
-    if (!prslClientId || !prslClientSecret || !prslRefreshToken) {
-      return Response.json(
+    const resendApiKey = String(env.RESEND_API_KEY || '').trim();
+    if (!resendApiKey) {
+      return jsonWithCors(
         {
           ok: false,
           error:
-            'PRSL email service is temporarily unavailable (missing OAuth2 configuration). Please try again later.'
+            'PRSL email service is temporarily unavailable (missing RESEND_API_KEY secret). Please try again later.'
         },
-        { status: 503 }
+        503,
+        request,
+        requestUrl,
+        env
       );
     }
-
-    if (prslUser.toLowerCase() !== PRSL_CONTACT_FROM_EMAIL.toLowerCase()) {
-      return Response.json(
-        {
-          ok: false,
-          error: 'PRSL email sender configuration mismatch. Please contact the site administrator.'
-        },
-        { status: 503 }
-      );
-    }
-
-    const prslOAuthConfig: GmailOAuthAccountConfig = {
-      expectedEmail: PRSL_CONTACT_FROM_EMAIL,
-      clientId: prslClientId,
-      clientSecret: prslClientSecret,
-      refreshToken: prslRefreshToken
-    };
 
     const payload: ContactFormPayload = {
       name,
@@ -990,10 +977,10 @@ async function handleContactPost(request: Request, env: WorkerEnv): Promise<Resp
       customerConfirmationHtml
     } = buildContactEmailTemplates(payload);
 
-    // 1. Send PRSL notification email to TO + CC
-    const notifyResult = await sendEmailViaGmailRestApi(prslOAuthConfig, {
+    // 1. Send PRSL inquiry email to pacificregionalsoccerleague@gmail.com, CC pacificregionalsl@gmail.com, Reply-To submitter
+    const notifyResult = await sendEmailViaResend(resendApiKey, {
       fromName: PRSL_CONTACT_FROM_NAME,
-      fromEmail: PRSL_CONTACT_FROM_EMAIL,
+      fromEmail: VERIFIED_FROM_EMAIL,
       to: PRSL_CONTACT_TO_EMAIL,
       cc: PRSL_CONTACT_CC_EMAIL,
       replyTo: payload.email,
@@ -1003,62 +990,93 @@ async function handleContactPost(request: Request, env: WorkerEnv): Promise<Resp
     });
 
     if (!notifyResult?.id) {
-      return Response.json(
+      return jsonWithCors(
         {
           ok: false,
           error: 'The email server did not accept the notification email. Please try again.'
         },
-        { status: 502 }
+        502,
+        request,
+        requestUrl,
+        env
       );
     }
 
-    // 2. Send customer automatic confirmation email
+    // 2. Send submitter acknowledgment email
     let confirmationEmailSent = false;
     try {
-      const confirmResult = await sendEmailViaGmailRestApi(prslOAuthConfig, {
+      const confirmResult = await sendEmailViaResend(resendApiKey, {
         fromName: PRSL_CONTACT_FROM_NAME,
-        fromEmail: PRSL_CONTACT_FROM_EMAIL,
+        fromEmail: VERIFIED_FROM_EMAIL,
         to: payload.email,
-        replyTo: PRSL_CONTACT_FROM_EMAIL,
+        replyTo: PRSL_CONTACT_TO_EMAIL,
         subject: customerConfirmationSubject,
         text: customerConfirmationText,
         html: customerConfirmationHtml
       });
       confirmationEmailSent = Boolean(confirmResult?.id);
     } catch (confirmErr) {
-      console.error('Error sending PRSL customer confirmation email:', confirmErr);
+      console.error('Error sending PRSL customer confirmation email via Resend:', confirmErr);
     }
 
-    return Response.json({
-      ok: true,
-      notificationEmailAccepted: true,
-      confirmationEmailSent,
-      submittedAt: payload.submittedAt
-    });
+    return jsonWithCors(
+      {
+        ok: true,
+        notificationEmailAccepted: true,
+        confirmationEmailSent,
+        submittedAt: payload.submittedAt
+      },
+      200,
+      request,
+      requestUrl,
+      env
+    );
   } catch (error) {
     console.error('Error processing /api/contact on Worker:', error);
-    return Response.json(
+    return jsonWithCors(
       {
         ok: false,
         error:
           'We were unable to deliver your message at this time. Please check your connection and try again.'
       },
-      { status: 502 }
+      502,
+      request,
+      requestUrl,
+      env
     );
   }
 }
 
-async function handleQuoteRequestPost(request: Request, env: WorkerEnv): Promise<Response> {
+async function handleQuoteRequestPost(
+  request: Request,
+  requestUrl: URL,
+  env: WorkerEnv
+): Promise<Response> {
   const uploadedR2Keys: string[] = [];
   try {
+    const originHeader = request.headers.get('Origin');
+    if (originHeader && !isAllowedOrigin(originHeader, requestUrl, env)) {
+      return jsonWithCors(
+        { ok: false, error: 'Cross-origin request not permitted.' },
+        403,
+        request,
+        requestUrl,
+        env
+      );
+    }
+
     const clientIp = getClientIp(request);
     if (!checkRateLimit(quoteRateMap, clientIp, QUOTE_RATE_LIMIT_MAX)) {
-      return Response.json(
+      return jsonWithCors(
         {
           ok: false,
-          error: 'Too many quote requests from this address. Please wait a few minutes and try again.'
+          error:
+            'Too many quote requests from this address. Please wait a few minutes and try again.'
         },
-        { status: 429 }
+        429,
+        request,
+        requestUrl,
+        env
       );
     }
 
@@ -1074,10 +1092,14 @@ async function handleQuoteRequestPost(request: Request, env: WorkerEnv): Promise
     let preferredContactMethod: 'Email' | 'Phone' | 'Text' = 'Email';
     let isPrslAffiliated = false;
     let submittedAt = new Date().toISOString();
+    let honeypot = '';
     const rawFiles: File[] = [];
 
     if (contentType.includes('multipart/form-data')) {
       const formData = await request.formData();
+      honeypot = String(
+        formData.get('website') || formData.get('_gotcha') || formData.get('honeypot') || ''
+      ).trim();
       fullName = sanitizeSingleLine(String(formData.get('fullName') || ''));
       clubOrganization = sanitizeSingleLine(String(formData.get('clubOrganization') || ''));
       teamName = sanitizeSingleLine(String(formData.get('teamName') || ''));
@@ -1114,6 +1136,7 @@ async function handleQuoteRequestPost(request: Request, env: WorkerEnv): Promise
       }
     } else {
       const body = (await request.json()) as Record<string, unknown>;
+      honeypot = String(body.website || body._gotcha || body.honeypot || '').trim();
       fullName = sanitizeSingleLine(String(body.fullName || ''));
       clubOrganization = sanitizeSingleLine(String(body.clubOrganization || ''));
       teamName = sanitizeSingleLine(String(body.teamName || ''));
@@ -1132,28 +1155,47 @@ async function handleQuoteRequestPost(request: Request, env: WorkerEnv): Promise
       submittedAt = String(body.submittedAt || new Date().toISOString());
     }
 
+    if (honeypot.length > 0) {
+      return jsonWithCors(
+        { ok: false, error: 'Spam submission detected.' },
+        400,
+        request,
+        requestUrl,
+        env
+      );
+    }
+
     if (!fullName || !clubOrganization || !email || !phone || !isPrslAffiliated) {
-      return Response.json(
+      return jsonWithCors(
         {
           ok: false,
           error: 'Missing required fields or PRSL affiliation confirmation.'
         },
-        { status: 400 }
+        400,
+        request,
+        requestUrl,
+        env
       );
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return Response.json(
+    if (email.length > 254 || !emailRegex.test(email)) {
+      return jsonWithCors(
         { ok: false, error: 'Please provide a valid email address.' },
-        { status: 400 }
+        400,
+        request,
+        requestUrl,
+        env
       );
     }
 
     if (rawFiles.length > QUOTE_MAX_FILES) {
-      return Response.json(
+      return jsonWithCors(
         { ok: false, error: `Maximum ${QUOTE_MAX_FILES} artwork files allowed per submission.` },
-        { status: 400 }
+        400,
+        request,
+        requestUrl,
+        env
       );
     }
 
@@ -1161,57 +1203,54 @@ async function handleQuoteRequestPost(request: Request, env: WorkerEnv): Promise
     for (const file of rawFiles) {
       const check = validateUploadedFile(file);
       if (!check.valid) {
-        return Response.json({ ok: false, error: check.reason }, { status: 400 });
+        return jsonWithCors({ ok: false, error: check.reason }, 400, request, requestUrl, env);
       }
       totalUploadBytes += file.size;
     }
 
     if (totalUploadBytes > QUOTE_MAX_TOTAL_FILES_BYTES) {
-      return Response.json(
+      return jsonWithCors(
         {
           ok: false,
           error: `Total artwork upload size (${formatBytes(totalUploadBytes)}) exceeds the 50 MB limit.`
         },
-        { status: 413 }
+        413,
+        request,
+        requestUrl,
+        env
       );
     }
 
-    // Verify SoCal Custom Canopies Gmail OAuth2 configuration
-    const socalUser = String(env.GMAIL_USER || PARTNER_NOTIFICATION_EMAIL).trim();
-    const socalClientId = String(
-      env.SOCAL_GMAIL_CLIENT_ID || env.GMAIL_OAUTH_CLIENT_ID || ''
-    ).trim();
-    const socalClientSecret = String(
-      env.SOCAL_GMAIL_CLIENT_SECRET || env.GMAIL_OAUTH_CLIENT_SECRET || ''
-    ).trim();
-    const socalRefreshToken = String(
-      env.SOCAL_GMAIL_REFRESH_TOKEN || env.GMAIL_REFRESH_TOKEN || ''
-    ).trim();
-
-    if (!socalClientId || !socalClientSecret || !socalRefreshToken) {
-      return Response.json(
+    const resendApiKey = String(env.RESEND_API_KEY || '').trim();
+    if (!resendApiKey) {
+      return jsonWithCors(
         {
           ok: false,
           error:
-            'Quote request email service is temporarily unavailable (missing OAuth2 configuration). Please try again later.'
+            'Quote request email service is temporarily unavailable (missing RESEND_API_KEY secret). Please try again later.'
         },
-        { status: 503 }
+        503,
+        request,
+        requestUrl,
+        env
       );
     }
 
     // Require R2 bucket & signing secret when artwork files are uploaded
     if (rawFiles.length > 0 && (!env.QUOTE_UPLOADS_BUCKET || !env.R2_DOWNLOAD_SIGNING_SECRET)) {
-      return Response.json(
+      return jsonWithCors(
         {
           ok: false,
           error:
             'Secure artwork storage (R2) is not configured on this environment. Please contact the administrator.'
         },
-        { status: 503 }
+        503,
+        request,
+        requestUrl,
+        env
       );
     }
 
-    const requestUrl = new URL(request.url);
     const origin = (env.APP_URL || requestUrl.origin).replace(/\/+$/, '');
     const nowMs = Date.now();
     const expiresAtMs = nowMs + R2_RETENTION_MS;
@@ -1219,7 +1258,7 @@ async function handleQuoteRequestPost(request: Request, env: WorkerEnv): Promise
     const dateFolder = new Date(nowMs).toISOString().slice(0, 10);
 
     const storedLogos: StoredArtworkFileMeta[] = [];
-    const directAttachments: MimeAttachment[] = [];
+    const directAttachments: ResendAttachmentPayload[] = [];
     const includeDirectAttachments = totalUploadBytes <= DIRECT_EMAIL_ATTACHMENT_MAX_BYTES;
 
     for (const file of rawFiles) {
@@ -1264,8 +1303,8 @@ async function handleQuoteRequestPost(request: Request, env: WorkerEnv): Promise
       if (includeDirectAttachments) {
         directAttachments.push({
           filename: file.name,
-          contentType: file.type || 'application/octet-stream',
-          contentBytes: fileBytes
+          content: bytesToBase64(fileBytes),
+          content_type: file.type || 'application/octet-stream'
         });
       }
     }
@@ -1285,56 +1324,63 @@ async function handleQuoteRequestPost(request: Request, env: WorkerEnv): Promise
       submittedAt
     };
 
-    const { vendorSubject, vendorHtml, confirmationSubject, confirmationHtml } =
-      buildQuoteEmailTemplates(payload);
+    const {
+      vendorSubject,
+      vendorText,
+      vendorHtml,
+      confirmationSubject,
+      confirmationText,
+      confirmationHtml
+    } = buildQuoteEmailTemplates(payload);
 
-    const socalOAuthConfig: GmailOAuthAccountConfig = {
-      expectedEmail: socalUser,
-      clientId: socalClientId,
-      clientSecret: socalClientSecret,
-      refreshToken: socalRefreshToken
-    };
-
-    // 1. Send vendor notification email (must succeed before returning ok: true)
-    const vendorSendResult = await sendEmailViaGmailRestApi(socalOAuthConfig, {
+    // 1. Send vendor notification email to socalcustomcanopies@gmail.com with Reply-To submitter (must succeed)
+    const vendorSendResult = await sendEmailViaResend(resendApiKey, {
       fromName: SOCAL_VENDOR_FROM_NAME,
-      fromEmail: socalUser,
+      fromEmail: VERIFIED_FROM_EMAIL,
       to: PARTNER_NOTIFICATION_EMAIL,
       replyTo: payload.email,
       subject: vendorSubject,
+      text: vendorText,
       html: vendorHtml,
       attachments: directAttachments
     });
 
     if (!vendorSendResult?.id) {
-      throw new Error('Vendor notification email was not accepted by Gmail REST API.');
+      throw new Error('Vendor notification email was not accepted by Resend.');
     }
 
-    // 2. Send customer confirmation email
+    // 2. Send submitter acknowledgment email
     let confirmationEmailSent = false;
     try {
-      const confirmResult = await sendEmailViaGmailRestApi(socalOAuthConfig, {
+      const confirmResult = await sendEmailViaResend(resendApiKey, {
         fromName: SOCAL_CONFIRMATION_FROM_NAME,
-        fromEmail: socalUser,
+        fromEmail: VERIFIED_FROM_EMAIL,
         to: payload.email,
         replyTo: PARTNER_NOTIFICATION_EMAIL,
         subject: confirmationSubject,
+        text: confirmationText,
         html: confirmationHtml
       });
       confirmationEmailSent = Boolean(confirmResult?.id);
     } catch (confirmErr) {
-      console.error('Error sending SoCal customer confirmation email:', confirmErr);
+      console.error('Error sending SoCal customer confirmation email via Resend:', confirmErr);
     }
 
-    return Response.json({
-      ok: true,
-      emailConfigured: true,
-      vendorEmailSent: true,
-      confirmationEmailSent,
-      uploadedFilesCount: storedLogos.length,
-      partnerRecipient: PARTNER_NOTIFICATION_EMAIL,
-      customerRecipient: payload.email
-    });
+    return jsonWithCors(
+      {
+        ok: true,
+        emailConfigured: true,
+        vendorEmailSent: true,
+        confirmationEmailSent,
+        uploadedFilesCount: storedLogos.length,
+        partnerRecipient: PARTNER_NOTIFICATION_EMAIL,
+        customerRecipient: payload.email
+      },
+      200,
+      request,
+      requestUrl,
+      env
+    );
   } catch (error) {
     // Roll back any R2 uploads if the quote request email failed so no orphan files remain
     if (uploadedR2Keys.length > 0 && env.QUOTE_UPLOADS_BUCKET) {
@@ -1345,7 +1391,7 @@ async function handleQuoteRequestPost(request: Request, env: WorkerEnv): Promise
       }
     }
     console.error('Error processing /api/quote-request on Worker:', error);
-    return Response.json(
+    return jsonWithCors(
       {
         ok: false,
         error:
@@ -1353,13 +1399,16 @@ async function handleQuoteRequestPost(request: Request, env: WorkerEnv): Promise
             ? error.message
             : 'Failed to process quote request on server.'
       },
-      { status: 502 }
+      502,
+      request,
+      requestUrl,
+      env
     );
   }
 }
 
 async function handlePrivateQuoteFileDownload(
-  request: Request,
+  _request: Request,
   env: WorkerEnv,
   url: URL
 ): Promise<Response> {
@@ -1482,27 +1531,57 @@ export default {
   async fetch(request: Request, env: WorkerEnv, _ctx: ExecutionContextLike): Promise<Response> {
     const url = new URL(request.url);
 
+    // Handle CORS preflight on /api/* routes
+    if (request.method === 'OPTIONS' && url.pathname.startsWith('/api/')) {
+      const originHeader = request.headers.get('Origin');
+      if (originHeader && !isAllowedOrigin(originHeader, url, env)) {
+        return new Response(null, { status: 403 });
+      }
+      return new Response(null, {
+        status: 204,
+        headers: getCorsHeaders(request, url, env)
+      });
+    }
+
     if (url.pathname === '/api/health' && request.method === 'GET') {
-      return handleHealth(env);
+      return handleHealth(request, url, env);
     }
 
     if (url.pathname === '/api/contact') {
       if (request.method !== 'POST') {
-        return Response.json({ ok: false, error: 'Method Not Allowed' }, { status: 405 });
+        return jsonWithCors(
+          { ok: false, error: 'Method Not Allowed' },
+          405,
+          request,
+          url,
+          env
+        );
       }
-      return handleContactPost(request, env);
+      return handleContactPost(request, url, env);
     }
 
     if (url.pathname === '/api/quote-request') {
       if (request.method !== 'POST') {
-        return Response.json({ ok: false, error: 'Method Not Allowed' }, { status: 405 });
+        return jsonWithCors(
+          { ok: false, error: 'Method Not Allowed' },
+          405,
+          request,
+          url,
+          env
+        );
       }
-      return handleQuoteRequestPost(request, env);
+      return handleQuoteRequestPost(request, url, env);
     }
 
     if (url.pathname.startsWith('/api/quote-files/')) {
       if (request.method !== 'GET') {
-        return Response.json({ ok: false, error: 'Method Not Allowed' }, { status: 405 });
+        return jsonWithCors(
+          { ok: false, error: 'Method Not Allowed' },
+          405,
+          request,
+          url,
+          env
+        );
       }
       return handlePrivateQuoteFileDownload(request, env, url);
     }

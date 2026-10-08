@@ -11,6 +11,8 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const RESEND_API_URL = 'https://api.resend.com/emails';
+const VERIFIED_FROM_EMAIL = 'notifications@pacificregionalsoccer.com';
 const PARTNER_NOTIFICATION_EMAIL = 'socalcustomcanopies@gmail.com';
 const PRSL_CONTACT_TO_EMAIL = 'pacificregionalsoccerleague@gmail.com';
 const PRSL_CONTACT_CC_EMAIL = 'pacificregionalsl@gmail.com';
@@ -19,6 +21,85 @@ const CONTACT_MAX_BODY_BYTES = 64 * 1024; // 64 KB limit for contact form reques
 const CONTACT_RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const CONTACT_RATE_LIMIT_MAX_REQUESTS = 10;
 const contactRateLimitMap = new Map<string, { count: number; windowStart: number }>();
+
+interface ResendAttachmentPayload {
+  filename: string;
+  content: string;
+  content_type?: string;
+}
+
+interface ResendSendOptions {
+  fromName: string;
+  to: string | string[];
+  cc?: string | string[];
+  replyTo?: string | string[];
+  subject: string;
+  text?: string;
+  html: string;
+  attachments?: ResendAttachmentPayload[];
+}
+
+async function sendEmailViaResend(
+  apiKey: string,
+  options: ResendSendOptions
+): Promise<{ id: string }> {
+  const safeFromName = String(options.fromName).replace(/[\r\n"]+/g, ' ').trim();
+  const payload: Record<string, unknown> = {
+    from: `${safeFromName} <${VERIFIED_FROM_EMAIL}>`,
+    to: Array.isArray(options.to) ? options.to : [options.to],
+    subject: options.subject,
+    html: options.html
+  };
+  if (options.cc) {
+    payload.cc = Array.isArray(options.cc) ? options.cc : [options.cc];
+  }
+  if (options.replyTo) {
+    payload.reply_to = options.replyTo;
+  }
+  if (options.text) {
+    payload.text = options.text;
+  }
+  if (options.attachments && options.attachments.length > 0) {
+    payload.attachments = options.attachments;
+  }
+
+  const res = await fetch(RESEND_API_URL, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    let errorDetail = `HTTP ${res.status}`;
+    try {
+      const errJson = (await res.json()) as {
+        message?: string;
+        error?: string | { message?: string };
+      };
+      if (typeof errJson?.message === 'string' && errJson.message) {
+        errorDetail = errJson.message;
+      } else if (typeof errJson?.error === 'string' && errJson.error) {
+        errorDetail = errJson.error;
+      } else if (typeof errJson?.error === 'object' && errJson?.error?.message) {
+        errorDetail = errJson.error.message;
+      }
+    } catch {
+      // Ignore JSON parse errors
+    }
+    throw new Error(`Resend API delivery failed: ${errorDetail}`);
+  }
+
+  const data = (await res.json()) as { id?: string };
+  if (!data?.id) {
+    throw new Error('Resend API did not return a valid email delivery ID.');
+  }
+
+  return { id: data.id };
+}
+
 
 const uploadDir = path.join(os.tmpdir(), 'prsl-quote-uploads');
 if (!fs.existsSync(uploadDir)) {
@@ -519,21 +600,22 @@ async function startServer() {
           return;
         }
 
+        const resendApiKey = String(process.env.RESEND_API_KEY || '').trim();
         const prslSmtpUser = String(process.env.PRSL_GMAIL_USER || '').trim();
         const prslSmtpPass = String(process.env.PRSL_GMAIL_APP_PASSWORD || '').trim();
         const smtpHost = process.env.SMTP_HOST || 'smtp.gmail.com';
         const smtpPort = Number(process.env.SMTP_PORT) || 465;
 
-        if (!prslSmtpUser || !prslSmtpPass) {
+        if (!resendApiKey && (!prslSmtpUser || !prslSmtpPass)) {
           res.status(503).json({
             ok: false,
             error:
-              'PRSL email service is not yet configured. Please set PRSL_GMAIL_USER and PRSL_GMAIL_APP_PASSWORD in the environment secrets.'
+              'PRSL email service is not yet configured. Please set RESEND_API_KEY in the environment secrets.'
           });
           return;
         }
 
-        if (prslSmtpUser.toLowerCase() !== PRSL_CONTACT_TO_EMAIL.toLowerCase()) {
+        if (!resendApiKey && prslSmtpUser.toLowerCase() !== PRSL_CONTACT_TO_EMAIL.toLowerCase()) {
           res.status(503).json({
             ok: false,
             error: `PRSL_GMAIL_USER must be authenticated as ${PRSL_CONTACT_TO_EMAIL}.`
@@ -559,58 +641,98 @@ async function startServer() {
           customerConfirmationHtml
         } = buildContactEmailTemplates(payload);
 
-        const prslTransporter = nodemailer.createTransport({
-          host: smtpHost,
-          port: smtpPort,
-          secure: smtpPort === 465,
-          auth: {
-            user: prslSmtpUser,
-            pass: prslSmtpPass
-          }
-        });
-
-        const prslFromHeader = `Pacific Regional Soccer League <${PRSL_CONTACT_TO_EMAIL}>`;
-
-        const notificationInfo = await prslTransporter.sendMail({
-          from: prslFromHeader,
-          to: PRSL_CONTACT_TO_EMAIL,
-          cc: PRSL_CONTACT_CC_EMAIL,
-          replyTo: payload.email,
-          subject: notificationSubject,
-          text: notificationText,
-          html: notificationHtml
-        });
-
-        const acceptedList = Array.isArray(notificationInfo.accepted)
-          ? notificationInfo.accepted.map((entry) => String(entry).toLowerCase())
-          : [];
-        const notificationEmailAccepted = acceptedList.length > 0;
-
-        if (!notificationEmailAccepted) {
-          res.status(502).json({
-            ok: false,
-            error: 'The email server did not accept the notification message. Please try again.'
-          });
-          return;
-        }
-
+        let notificationEmailAccepted = false;
         let confirmationEmailSent = false;
-        try {
-          const confirmationInfo = await prslTransporter.sendMail({
-            from: prslFromHeader,
-            to: payload.email,
-            replyTo: PRSL_CONTACT_TO_EMAIL,
-            subject: customerConfirmationSubject,
-            text: customerConfirmationText,
-            html: customerConfirmationHtml
+
+        if (resendApiKey) {
+          const notifyResult = await sendEmailViaResend(resendApiKey, {
+            fromName: 'Pacific Regional Soccer League',
+            to: PRSL_CONTACT_TO_EMAIL,
+            cc: PRSL_CONTACT_CC_EMAIL,
+            replyTo: payload.email,
+            subject: notificationSubject,
+            text: notificationText,
+            html: notificationHtml
           });
-          confirmationEmailSent =
-            Array.isArray(confirmationInfo.accepted) && confirmationInfo.accepted.length > 0;
-        } catch (confirmErr) {
-          console.error(
-            'Error sending customer confirmation email on /api/contact:',
-            confirmErr instanceof Error ? confirmErr.message : 'Unknown SMTP error'
-          );
+          notificationEmailAccepted = Boolean(notifyResult?.id);
+
+          if (!notificationEmailAccepted) {
+            res.status(502).json({
+              ok: false,
+              error: 'The email server did not accept the notification message. Please try again.'
+            });
+            return;
+          }
+
+          try {
+            const confirmResult = await sendEmailViaResend(resendApiKey, {
+              fromName: 'Pacific Regional Soccer League',
+              to: payload.email,
+              replyTo: PRSL_CONTACT_TO_EMAIL,
+              subject: customerConfirmationSubject,
+              text: customerConfirmationText,
+              html: customerConfirmationHtml
+            });
+            confirmationEmailSent = Boolean(confirmResult?.id);
+          } catch (confirmErr) {
+            console.error(
+              'Error sending customer confirmation email via Resend on /api/contact:',
+              confirmErr instanceof Error ? confirmErr.message : 'Unknown Resend error'
+            );
+          }
+        } else {
+          const prslTransporter = nodemailer.createTransport({
+            host: smtpHost,
+            port: smtpPort,
+            secure: smtpPort === 465,
+            auth: {
+              user: prslSmtpUser,
+              pass: prslSmtpPass
+            }
+          });
+
+          const prslFromHeader = `Pacific Regional Soccer League <${PRSL_CONTACT_TO_EMAIL}>`;
+
+          const notificationInfo = await prslTransporter.sendMail({
+            from: prslFromHeader,
+            to: PRSL_CONTACT_TO_EMAIL,
+            cc: PRSL_CONTACT_CC_EMAIL,
+            replyTo: payload.email,
+            subject: notificationSubject,
+            text: notificationText,
+            html: notificationHtml
+          });
+
+          const acceptedList = Array.isArray(notificationInfo.accepted)
+            ? notificationInfo.accepted.map((entry) => String(entry).toLowerCase())
+            : [];
+          notificationEmailAccepted = acceptedList.length > 0;
+
+          if (!notificationEmailAccepted) {
+            res.status(502).json({
+              ok: false,
+              error: 'The email server did not accept the notification message. Please try again.'
+            });
+            return;
+          }
+
+          try {
+            const confirmationInfo = await prslTransporter.sendMail({
+              from: prslFromHeader,
+              to: payload.email,
+              replyTo: PRSL_CONTACT_TO_EMAIL,
+              subject: customerConfirmationSubject,
+              text: customerConfirmationText,
+              html: customerConfirmationHtml
+            });
+            confirmationEmailSent =
+              Array.isArray(confirmationInfo.accepted) && confirmationInfo.accepted.length > 0;
+          } catch (confirmErr) {
+            console.error(
+              'Error sending customer confirmation email on /api/contact:',
+              confirmErr instanceof Error ? confirmErr.message : 'Unknown SMTP error'
+            );
+          }
         }
 
         res.json({
@@ -624,7 +746,7 @@ async function startServer() {
           'Error processing /api/contact:',
           err instanceof Error ? err.message : 'Unknown error'
         );
-        res.status(500).json({
+        res.status(502).json({
           ok: false,
           error: 'Unable to send your message right now. Please try again shortly.'
         });
@@ -639,12 +761,14 @@ async function startServer() {
     const prslUser = String(process.env.PRSL_GMAIL_USER || '').trim().toLowerCase();
     res.json({
       ok: true,
+      emailProvider: process.env.RESEND_API_KEY ? 'resend' : 'smtp',
+      fromAddress: VERIFIED_FROM_EMAIL,
+      resendConfigured: Boolean(process.env.RESEND_API_KEY),
       prslContactSmtpConfigured:
         Boolean(process.env.PRSL_GMAIL_USER && process.env.PRSL_GMAIL_APP_PASSWORD) &&
         prslUser === PRSL_CONTACT_TO_EMAIL.toLowerCase(),
       socalQuoteSmtpConfigured: Boolean(process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS),
-      smtpConfigured: Boolean(process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS),
-      resendConfigured: Boolean(process.env.RESEND_API_KEY)
+      smtpConfigured: Boolean(process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS)
     });
   });
 
@@ -746,6 +870,7 @@ async function startServer() {
         const { vendorSubject, vendorHtml, confirmationSubject, confirmationHtml } =
           buildEmailTemplates(payload);
 
+        const resendApiKey = String(process.env.RESEND_API_KEY || '').trim();
         const smtpUser =
           process.env.GMAIL_USER || process.env.SMTP_USER || PARTNER_NOTIFICATION_EMAIL;
         const smtpPass = process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS;
@@ -755,8 +880,58 @@ async function startServer() {
         let vendorEmailSent = false;
         let confirmationEmailSent = false;
 
-        // 1. Send via SMTP / Gmail if configured
-        if (smtpPass) {
+        // 1. Send via Resend REST API if RESEND_API_KEY is configured
+        if (resendApiKey) {
+          const resendAttachments: ResendAttachmentPayload[] = [];
+          let runningBytes = 0;
+          const maxResendAttachmentBytes = 12 * 1024 * 1024;
+
+          for (const item of logos) {
+            if (runningBytes + item.size > maxResendAttachmentBytes) {
+              continue;
+            }
+            if (item.filePath && fs.existsSync(item.filePath)) {
+              const fileBuf = fs.readFileSync(item.filePath);
+              resendAttachments.push({
+                filename: item.name,
+                content: fileBuf.toString('base64'),
+                content_type: item.type
+              });
+              runningBytes += item.size;
+            } else if (item.dataUrl && item.dataUrl.includes(';base64,')) {
+              resendAttachments.push({
+                filename: item.name,
+                content: item.dataUrl.split(';base64,')[1],
+                content_type: item.type
+              });
+              runningBytes += item.size;
+            }
+          }
+
+          const vendorSendResult = await sendEmailViaResend(resendApiKey, {
+            fromName: 'PRSL Partner Portal',
+            to: PARTNER_NOTIFICATION_EMAIL,
+            replyTo: payload.email,
+            subject: vendorSubject,
+            html: vendorHtml,
+            attachments: resendAttachments
+          });
+          vendorEmailSent = Boolean(vendorSendResult?.id);
+
+          try {
+            const confirmSendResult = await sendEmailViaResend(resendApiKey, {
+              fromName: 'SoCal Custom Canopies & Print',
+              to: payload.email,
+              replyTo: PARTNER_NOTIFICATION_EMAIL,
+              subject: confirmationSubject,
+              html: confirmationHtml
+            });
+            confirmationEmailSent = Boolean(confirmSendResult?.id);
+          } catch (err) {
+            console.error('Error sending customer confirmation email via Resend:', err);
+          }
+        } else if (smtpPass) {
+          // 2. Fallback to local Gmail SMTP if configured
           const transporter = nodemailer.createTransport({
             host: smtpHost,
             port: smtpPort,
@@ -767,7 +942,6 @@ async function startServer() {
             }
           });
 
-          // Gmail SMTP allows up to ~25MB total message size; attach files within limit
           let runningBytes = 0;
           const maxEmailAttachmentBytes = 20 * 1024 * 1024;
           const attachments: {
@@ -827,52 +1001,12 @@ async function startServer() {
         }
 
         if (!vendorEmailSent) {
-          // 2. Zero-API-key fallback via FormSubmit AJAX endpoint
-          try {
-            const originUrl =
-              process.env.APP_URL ||
-              (req.headers.origin as string) ||
-              'https://pacificregionalsoccer.com';
-            const formSubmitRes = await fetch(
-              `https://formsubmit.co/ajax/${PARTNER_NOTIFICATION_EMAIL}`,
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Accept: 'application/json',
-                  Origin: originUrl,
-                  Referer: originUrl
-                },
-                body: JSON.stringify({
-                  _subject: vendorSubject,
-                  _replyto: payload.email,
-                  _template: 'table',
-                  _autoresponse: `Thank you for submitting your Pacific Regional Soccer League (PRSL) Member Pricing request with SoCal Custom Canopies & Print for ${payload.clubOrganization}. A representative will review your club details and follow up with you via ${payload.preferredContactMethod}.`,
-                  fullName: payload.fullName,
-                  clubOrganization: payload.clubOrganization,
-                  teamName: payload.teamName || 'N/A',
-                  email: payload.email,
-                  phone: payload.phone,
-                  preferredContactMethod: payload.preferredContactMethod,
-                  selectedProducts:
-                    payload.selectedProducts.length > 0
-                      ? payload.selectedProducts.join(', ')
-                      : 'None specified',
-                  quantityNeeded: payload.quantityNeeded || 'Not specified',
-                  projectDetails: payload.projectDetails || 'None provided',
-                  uploadedLogos:
-                    logos.length > 0
-                      ? logos.map((l) => `${l.name} (${formatBytes(l.size)})`).join(', ')
-                      : 'No logo files attached',
-                  prslAffiliation: 'Confirmed PRSL Member Club / Team'
-                })
-              }
-            );
-            vendorEmailSent = formSubmitRes.ok;
-            confirmationEmailSent = formSubmitRes.ok;
-          } catch {
-            // Non-fatal fallback
-          }
+          cleanupTempFiles(multerFiles);
+          res.status(502).json({
+            ok: false,
+            error: 'The email server did not accept the quote request notification. Please try again.'
+          });
+          return;
         }
 
         cleanupTempFiles(multerFiles);
