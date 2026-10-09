@@ -17,3 +17,6 @@ dist/
 !.env.example
 # Private Cloudflare deployment secrets
 production-secrets.json
+
+# Private production secrets backups
+production-secrets.json.*
