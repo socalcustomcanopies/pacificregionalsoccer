@@ -314,7 +314,8 @@ export default function SoCalCustomCanopies() {
     {
       name: 'Partners',
       dropdown: [
-        { name: 'SoCal Custom Canopies', href: '/socal-custom-canopies', highlight: true }
+        { name: 'SoCal Custom Canopies', href: '/socal-custom-canopies', highlight: true },
+        { name: 'Calsouth', href: 'https://calsouth.com/' }
       ]
     },
     {

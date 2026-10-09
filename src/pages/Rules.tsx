@@ -75,6 +75,7 @@ export default function Rules() {
     ]},
     { name: 'Partners', dropdown: [
       { name: 'SoCal Custom Canopies', href: '/socal-custom-canopies', highlight: true },
+      { name: 'Calsouth', href: 'https://calsouth.com/' },
     ]},
     { name: 'Rules', dropdown: [
       { name: 'League Rules', href: '/rules' },

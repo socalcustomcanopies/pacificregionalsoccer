@@ -97,6 +97,7 @@ export default function Home() {
     ]},
     { name: 'Partners', dropdown: [
       { name: 'SoCal Custom Canopies', href: '/socal-custom-canopies', highlight: true },
+      { name: 'Calsouth', href: 'https://calsouth.com/' },
     ]},
     { name: 'Rules', icon: Book, dropdown: [
       { name: 'League Rules', href: '/rules' },
@@ -318,48 +319,41 @@ export default function Home() {
               <span className="inline-block lg:inline">Youth Soccer League</span>
             </p>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 max-w-lg items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 max-w-lg">
               <a 
-                href="https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0" 
+                href="https://soccer.sincsports.com/schedule.aspx?tid=PACRSL&tab=3&sub=0" 
                 target="_blank" 
                 rel="noreferrer" 
-                className="btn-primary bg-[#C8102E] hover:bg-[#a00c24] shadow-[0_10px_20px_rgba(200,16,46,0.3)] h-full flex items-center justify-center text-center py-4 text-lg font-black uppercase"
+                className="btn-outline text-center py-3.5 font-bold"
               >
-                Fall Registration
+                Fall Schedule
               </a>
-              <div className="flex flex-col gap-3">
-                <a 
-                  href="https://soccer.sincsports.com/schedule.aspx?tid=PACRSL&tab=3&sub=0" 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="btn-outline text-center py-3.5 font-bold"
-                >
-                  Fall Schedule
-                </a>
-                <a 
-                  href="#events" 
-                  className="btn-outline text-center py-3.5 font-bold"
-                >
-                  View Events
-                </a>
-              </div>
+              <a 
+                href="#events" 
+                className="btn-outline text-center py-3.5 font-bold"
+              >
+                View Events
+              </a>
             </div>
           </motion.div>
 
           <div className="col-span-12 lg:col-span-4 flex flex-col gap-5">
-            <motion.div 
+            <motion.a 
+              href="https://calsouth.com/"
+              target="_blank"
+              rel="noopener noreferrer"
               variants={revealVariants}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="glass-panel group aspect-[4/3] lg:h-full bg-white flex items-center justify-center p-5 animate-fade-in"
+              className="glass-panel group aspect-[4/3] lg:h-full bg-white flex items-center justify-center p-5 animate-fade-in block"
             >
               <img 
                 src="https://images.pacificregionalsoccer.com/26-27%20League%20LOGO.png" 
                 alt="CalSouth Sanctioned League 2026-2027" 
                 className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105" 
               />
-            </motion.div>
+            </motion.a>
           </div>
         </div>
 
@@ -525,16 +519,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Official League Partner Section */}
+      {/* Official League Partners Section */}
       <section id="partners" className="py-20 px-[5%]">
         <div className="text-center mb-12">
           <h2 className="gradient-text text-4xl font-black uppercase mb-3">
-            Official League Partner
+            Official League Partners
           </h2>
           <div className="w-16 h-1 bg-[#C8102E] mx-auto rounded-full" />
         </div>
 
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto flex flex-col gap-8">
           <div className="glass-panel bg-white p-8 lg:p-10 border-l-8 border-l-[#111111] border-b-8 border-b-[#C8102E]">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-7">
@@ -573,6 +567,47 @@ export default function Home() {
                     className="w-full h-auto block"
                   />
                 </Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-panel bg-white p-8 lg:p-10 border-l-8 border-l-[#111111] border-b-8 border-b-[#C8102E]">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-7">
+                <div className="mb-4">
+                  <span className="dark-badge">OFFICIAL PARTNER</span>
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#111111] mb-3">
+                  Calsouth
+                </h3>
+                <p className="text-[#333333] leading-relaxed mb-6 text-base sm:text-lg">
+                  Pacific Regional Soccer League is an official CalSouth sanctioned league, providing clubs, teams, coaches, referees, and players across Southern California with sanctioned competition, coaching education, and referee development resources.
+                </p>
+                <div className="flex flex-wrap items-center gap-4">
+                  <a
+                    href="https://calsouth.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary py-3.5 px-6 text-sm gap-2"
+                  >
+                    <span>VISIT CALSOUTH</span>
+                    <ArrowRight size={16} />
+                  </a>
+                </div>
+              </div>
+              <div className="lg:col-span-5">
+                <a
+                  href="https://calsouth.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center rounded-lg overflow-hidden shadow-md border border-black/10 bg-white p-6"
+                >
+                  <img
+                    src="https://images.pacificregionalsoccer.com/26-27%20League%20LOGO.png"
+                    alt="Calsouth Official Partner"
+                    className="max-h-56 w-auto object-contain block"
+                  />
+                </a>
               </div>
             </div>
           </div>
