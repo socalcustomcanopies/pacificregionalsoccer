@@ -6,3 +6,17 @@ coverage/
 *.log
 .env*
 !.env.example
+# Cloudflare Workers and npm migration
+bun.lock
+bun.lockb
+.wrangler/
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+# Private Cloudflare deployment secrets
+production-secrets.json
+
+# Private production secrets backups
+production-secrets.json.*

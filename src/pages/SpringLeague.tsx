@@ -328,15 +328,15 @@ export default function SpringLeague() {
                 <h3 className="text-xl font-bold uppercase italic mb-4">Age Matrix Table</h3>
                 <p className="text-gray-400 text-sm mb-6">Please refer to the official Age Matrix below to verify your team's appropriate bracket for the 2026/2027 competitive calendar year.</p>
                 <img 
-                  src="https://media.pacificregionalsoccer.com/age%20matrix%202026-2027.png" 
+                  src="https://images.pacificregionalsoccer.com/Screenshot%202026-05-18%20at%207.54.21%E2%80%AFPM.png" 
                   alt="Age Matrix" 
                   className="w-full rounded-lg border border-white/10 shadow-2xl cursor-zoom-in group"
-                  onClick={() => setSelectedImg("https://media.pacificregionalsoccer.com/age%20matrix%202026-2027.png")}
+                  onClick={() => setSelectedImg("https://images.pacificregionalsoccer.com/Screenshot%202026-05-18%20at%207.54.21%E2%80%AFPM.png")}
                 />
             </div>
             <div className="md:col-span-4">
                 <img 
-                  src="https://media.pacificregionalsoccer.com/PacificRegionSL2025Art.avif" 
+                  src="https://images.pacificregionalsoccer.com/26-27%20League%20LOGO.png" 
                   alt="Spring Challenge Art" 
                   className="w-full max-w-[250px] mx-auto drop-shadow-2xl" 
                 />

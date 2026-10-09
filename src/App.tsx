@@ -18,10 +18,14 @@ function ScrollToTop() {
 
   useEffect(() => {
     if (hash) {
-      const el = document.getElementById(hash.substring(1));
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-      }
+      const targetId = hash.substring(1);
+      const timer = window.setTimeout(() => {
+        const el = document.getElementById(targetId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 60);
+      return () => window.clearTimeout(timer);
     } else {
       window.scrollTo(0, 0);
     }
@@ -38,12 +42,15 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/rules" element={<Rules />} />
         <Route path="/spring-league" element={<SpringLeague />} />
+        <Route path="/spring-2026" element={<SpringLeague />} />
         <Route path="/tournaments" element={<Tournaments />} />
         <Route path="/age-matrix" element={<AgeMatrix />} />
         <Route path="/success" element={<Success />} />
+        <Route path="/socal-custom" element={<SoCalCustomCanopies />} />
         <Route path="/socal-custom-canopies" element={<SoCalCustomCanopies />} />
         <Route path="/partners" element={<SoCalCustomCanopies />} />
         <Route path="/partners/socal-custom-canopies" element={<SoCalCustomCanopies />} />
+        <Route path="*" element={<Home />} />
       </Routes>
     </Router>
   );

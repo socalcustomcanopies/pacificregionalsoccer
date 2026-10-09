@@ -6,14 +6,10 @@ import {
   Mail, 
   LayoutGrid,
   Calendar,
-  Info,
-  Contact,
   GraduationCap,
   ArrowUp,
   Book,
-  Sparkles,
-  ArrowRight,
-  ShieldCheck
+  ArrowRight
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -25,34 +21,49 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', message: '', website: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [formErrorMessage, setFormErrorMessage] = useState('');
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormStatus('submitting');
-    
+    setFormErrorMessage('');
+
     const payload = {
-      name: formData.name,
-      email: formData.email,
-      message: formData.message
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      message: formData.message.trim(),
+      website: formData.website
     };
-    
-    const webAppUrl = 'https://script.google.com/macros/s/AKfycb8jXboUkfAe3Givz-ldsqN0YPA_ydhPdIHUFTP5QrRtY5up3Ap1k7eic5A6TIdOXitqA/exec';
-    
+
     try {
-      await fetch(webAppUrl, {
+      const response = await fetch('/api/contact', {
         method: 'POST',
-        mode: 'no-cors', // Avoids cross-origin issues with Apps Script
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json'
+        },
         body: JSON.stringify(payload)
       });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || !data || data.ok !== true || data.notificationEmailAccepted !== true) {
+        setFormStatus('error');
+        setFormErrorMessage(
+          (data && typeof data.error === 'string' && data.error) ||
+            'Something went wrong while sending your message. Please try again.'
+        );
+        return;
+      }
+
       setFormStatus('success');
-      setFormData({ name: '', email: '', message: '' });
-      alert('Thank you! Your submission was saved.');
+      setFormData({ name: '', email: '', message: '', website: '' });
     } catch (err) {
-      console.error('Error:', err);
+      console.error('Contact form submission error:', err);
       setFormStatus('error');
+      setFormErrorMessage('Unable to reach the server. Please check your connection and try again.');
     }
   };
 
@@ -602,6 +613,16 @@ export default function Home() {
            >
               <h2 className="text-2xl font-black uppercase text-[#111] mb-8">Contact Us</h2>
               <form id="contactForm" onSubmit={handleFormSubmit} className="flex flex-col gap-5">
+                <input
+                  type="text"
+                  name="website"
+                  value={formData.website}
+                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="hidden"
+                />
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-black uppercase tracking-wider text-gray-500">Name *</label>
                   <input 
@@ -650,12 +671,12 @@ export default function Home() {
                 
                 {formStatus === 'success' && (
                   <div className="text-green-600 font-bold text-center mt-2">
-                    Message saved successfully!
+                    Thank you! Your message has been sent to Pacific Regional Soccer League. A confirmation email has also been sent to your inbox.
                   </div>
                 )}
                 {formStatus === 'error' && (
                   <div className="text-red-500 font-bold text-center mt-2">
-                    Something went wrong. Please try again.
+                    {formErrorMessage || 'Something went wrong. Please try again.'}
                   </div>
                 )}
               </form>
