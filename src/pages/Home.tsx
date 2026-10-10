@@ -97,7 +97,7 @@ export default function Home() {
     ]},
     { name: 'Partners', dropdown: [
       { name: 'SoCal Custom Canopies', href: '/socal-custom-canopies', highlight: true },
-      { name: 'Calsouth', href: 'https://calsouth.com/' },
+      { name: 'CalSouth', href: 'https://calsouth.com/', highlightBlue: true },
     ]},
     { name: 'Rules', icon: Book, dropdown: [
       { name: 'League Rules', href: '/rules' },
@@ -180,6 +180,8 @@ export default function Home() {
                             className={
                               sub.highlight 
                                 ? "block px-5 py-3 bg-[#C8102E] text-white font-black text-center no-underline text-[0.85rem] hover:bg-[#a00c24] transition-all"
+                                : sub.highlightBlue
+                                ? "block px-5 py-3 bg-[#1d4ed8] text-white font-black text-center no-underline text-[0.85rem] hover:bg-[#1e40af] transition-all"
                                 : "block px-5 py-3 text-[#1a1a1a] no-underline text-[0.85rem] font-semibold border-b border-black/5 hover:bg-gray-50 hover:text-[#C8102E] hover:pl-7 transition-all"
                             }
                           >
@@ -192,6 +194,8 @@ export default function Home() {
                             className={
                               sub.highlight 
                                 ? "block px-5 py-3 bg-[#C8102E] text-white font-black text-center no-underline text-[0.85rem] hover:bg-[#a00c24] transition-all"
+                                : sub.highlightBlue
+                                ? "block px-5 py-3 bg-[#1d4ed8] text-white font-black text-center no-underline text-[0.85rem] hover:bg-[#1e40af] transition-all"
                                 : "block px-5 py-3 text-[#1a1a1a] no-underline text-[0.85rem] font-semibold border-b border-black/5 hover:bg-gray-50 hover:text-[#C8102E] hover:pl-7 transition-all"
                             }
                           >
@@ -247,6 +251,8 @@ export default function Home() {
                             className={
                               sub.highlight
                                 ? "text-lg font-black text-white bg-[#C8102E] py-3 px-6 rounded-md my-2 block shadow-md hover:bg-[#a00c24] transition-all"
+                                : sub.highlightBlue
+                                ? "text-lg font-black text-white bg-[#1d4ed8] py-3 px-6 rounded-md my-2 block shadow-md hover:bg-[#1e40af] transition-all"
                                 : "text-lg font-bold text-[#1a1a1a] uppercase py-3 hover:text-[#C8102E]"
                             }
                           >
@@ -260,6 +266,8 @@ export default function Home() {
                             className={
                               sub.highlight
                                 ? "text-lg font-black text-white bg-[#C8102E] py-3 px-6 rounded-md my-2 block shadow-md hover:bg-[#a00c24] transition-all"
+                                : sub.highlightBlue
+                                ? "text-lg font-black text-white bg-[#1d4ed8] py-3 px-6 rounded-md my-2 block shadow-md hover:bg-[#1e40af] transition-all"
                                 : "text-lg font-bold text-[#1a1a1a] uppercase py-3 hover:text-[#C8102E]"
                             }
                           >
@@ -577,8 +585,8 @@ export default function Home() {
                 <div className="mb-4">
                   <span className="dark-badge">OFFICIAL PARTNER</span>
                 </div>
-                <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-[#111111] mb-3">
-                  Calsouth
+                <h3 className="text-2xl sm:text-3xl font-black tracking-tight text-[#111111] mb-3">
+                  CalSouth
                 </h3>
                 <p className="text-[#333333] leading-relaxed mb-6 text-base sm:text-lg">
                   Pacific Regional Soccer League is an official CalSouth sanctioned league, providing clubs, teams, coaches, referees, and players across Southern California with sanctioned competition, coaching education, and referee development resources.
@@ -604,7 +612,7 @@ export default function Home() {
                 >
                   <img
                     src="https://images.pacificregionalsoccer.com/26-27%20League%20LOGO.png"
-                    alt="Calsouth Official Partner"
+                    alt="CalSouth Official Partner"
                     className="max-h-56 w-auto object-contain block"
                   />
                 </a>

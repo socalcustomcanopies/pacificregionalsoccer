@@ -315,7 +315,7 @@ export default function SoCalCustomCanopies() {
       name: 'Partners',
       dropdown: [
         { name: 'SoCal Custom Canopies', href: '/socal-custom-canopies', highlight: true },
-        { name: 'Calsouth', href: 'https://calsouth.com/' }
+        { name: 'CalSouth', href: 'https://calsouth.com/', highlightBlue: true }
       ]
     },
     {
@@ -548,6 +548,8 @@ export default function SoCalCustomCanopies() {
                         className={
                           sub.highlight
                             ? 'block px-5 py-3 bg-[#C8102E] text-white font-black text-center no-underline text-[0.85rem] hover:bg-[#a00c24] transition-all'
+                            : sub.highlightBlue
+                            ? 'block px-5 py-3 bg-[#1d4ed8] text-white font-black text-center no-underline text-[0.85rem] hover:bg-[#1e40af] transition-all'
                             : 'block px-5 py-3 text-[#1a1a1a] no-underline text-[0.85rem] font-semibold border-b border-black/5 hover:bg-gray-50 hover:text-[#C8102E] hover:pl-7 transition-all'
                         }
                       >
@@ -560,6 +562,8 @@ export default function SoCalCustomCanopies() {
                         className={
                           sub.highlight
                             ? 'block px-5 py-3 bg-[#C8102E] text-white font-black text-center no-underline text-[0.85rem] hover:bg-[#a00c24] transition-all'
+                            : sub.highlightBlue
+                            ? 'block px-5 py-3 bg-[#1d4ed8] text-white font-black text-center no-underline text-[0.85rem] hover:bg-[#1e40af] transition-all'
                             : 'block px-5 py-3 text-[#1a1a1a] no-underline text-[0.85rem] font-semibold border-b border-black/5 hover:bg-gray-50 hover:text-[#C8102E] hover:pl-7 transition-all'
                         }
                       >
@@ -621,6 +625,8 @@ export default function SoCalCustomCanopies() {
                           className={
                             sub.highlight
                               ? 'text-lg font-black text-white bg-[#C8102E] py-3 px-6 rounded-md my-2 block shadow-md hover:bg-[#a00c24] transition-all'
+                              : sub.highlightBlue
+                              ? 'text-lg font-black text-white bg-[#1d4ed8] py-3 px-6 rounded-md my-2 block shadow-md hover:bg-[#1e40af] transition-all'
                               : 'text-lg font-bold text-[#1a1a1a] uppercase py-3 hover:text-[#C8102E]'
                           }
                         >
@@ -634,6 +640,8 @@ export default function SoCalCustomCanopies() {
                           className={
                             sub.highlight
                               ? 'text-lg font-black text-white bg-[#C8102E] py-3 px-6 rounded-md my-2 block shadow-md hover:bg-[#a00c24] transition-all'
+                              : sub.highlightBlue
+                              ? 'text-lg font-black text-white bg-[#1d4ed8] py-3 px-6 rounded-md my-2 block shadow-md hover:bg-[#1e40af] transition-all'
                               : 'text-lg font-bold text-[#1a1a1a] uppercase py-3 hover:text-[#C8102E]'
                           }
                         >
