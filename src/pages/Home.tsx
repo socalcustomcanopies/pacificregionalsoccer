@@ -21,7 +21,7 @@ export default function Home() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
   
-  const [formData, setFormData] = useState({ name: '', email: '', message: '', website: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', subject: '', message: '', website: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [formErrorMessage, setFormErrorMessage] = useState('');
 
@@ -33,6 +33,8 @@ export default function Home() {
     const payload = {
       name: formData.name.trim(),
       email: formData.email.trim(),
+      phone: formData.phone.trim(),
+      subject: formData.subject.trim(),
       message: formData.message.trim(),
       website: formData.website
     };
@@ -59,7 +61,7 @@ export default function Home() {
       }
 
       setFormStatus('success');
-      setFormData({ name: '', email: '', message: '', website: '' });
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '', website: '' });
     } catch (err) {
       console.error('Contact form submission error:', err);
       setFormStatus('error');
@@ -679,7 +681,7 @@ export default function Home() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-gray-500">Email *</label>
+                  <label htmlFor="email" className="text-xs font-black uppercase tracking-wider text-gray-500">Email *</label>
                   <input 
                     type="email" 
                     id="email" 
@@ -691,7 +693,31 @@ export default function Home() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-black uppercase tracking-wider text-gray-500">Write a Message *</label>
+                  <label htmlFor="phone" className="text-xs font-black uppercase tracking-wider text-gray-500">Phone Number *</label>
+                  <input 
+                    type="tel" 
+                    id="phone" 
+                    required 
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="bg-gray-50 border border-gray-200 p-3 rounded focus:ring-2 focus:ring-[#C8102E] transition-all outline-none" 
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="subject" className="text-xs font-black uppercase tracking-wider text-gray-500">Subject Line *</label>
+                  <input 
+                    type="text" 
+                    id="subject" 
+                    required 
+                    value={formData.subject}
+                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                    className="bg-gray-50 border border-gray-200 p-3 rounded focus:ring-2 focus:ring-[#C8102E] transition-all outline-none" 
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="message" className="text-xs font-black uppercase tracking-wider text-gray-500">Write a Message *</label>
                   <textarea 
                     id="message" 
                     required

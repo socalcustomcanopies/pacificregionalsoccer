@@ -883,9 +883,9 @@ async function handleContactPost(
     const subject = sanitizeSingleLine(String(body.subject || ''));
     const message = String(body.message || '').trim();
 
-    if (!name || !email || !message) {
+    if (!name || !email || !phone || !subject || !message) {
       return jsonWithCors(
-        { ok: false, error: 'Please provide your name, email address, and message.' },
+        { ok: false, error: 'Please provide your name, email address, phone number, subject line, and message.' },
         400,
         request,
         requestUrl,

@@ -552,10 +552,10 @@ async function startServer() {
         const message = String(body.message || '').trim();
         const submittedAt = new Date().toISOString();
 
-        if (!name || !email || !message) {
+        if (!name || !email || !phone || !subject || !message) {
           res.status(400).json({
             ok: false,
-            error: 'Please fill in all required fields (Name, Email, and Message).'
+            error: 'Please fill in all required fields (Name, Email, Phone Number, Subject Line, and Message).'
           });
           return;
         }
