@@ -449,7 +449,7 @@ export default function Rules() {
              <h3 className="text-[#C8102E] font-bold text-lg mb-3">Check-In Game Day</h3>
              <div className="space-y-4 text-gray-400 mb-8">
                <p>All teams must check in at the field marshal table 30 minutes prior to each game. All players and a coach must be present at the time of the field check-in. A team that fails to report fifteen minutes prior to scheduled kick-off will forfeit the game. Failure to check-in will result in automatic disqualification from the tournament without a refund of the League fee.</p>
-               <p><strong>No card, no play.</strong> Only Cal South / USYS 2025/2026 ID's will be accepted. All U.S. teams must provide valid player identification cards with a photograph.</p>
+               <p><strong>No card, no play.</strong> Only Cal South / USYS 2026/2027 ID's will be accepted. All U.S. teams must provide valid player identification cards with a photograph.</p>
                <p>All coaches must have a team binder which consists of Player Medical Liability/Media Release forms & Birth certificates for each player on hand.</p>
              </div>
 
@@ -579,10 +579,10 @@ export default function Rules() {
           <section id="ref-fees" className="glass-panel p-8 lg:p-12 border border-white/10 bg-[#0f0f0f]/95 scroll-mt-36">
              <h2 className="text-2xl font-black uppercase mb-8 flex items-center gap-3"><CreditCard className="text-[#C8102E]" /> Referee Fee Schedule</h2>
              <img 
-               src="https://images.pacificregionalsoccer.com/REFEREE%20SCHEDULE.avif" 
-               alt="Referee Fee Schedule" 
+               src="https://pub-1641cc9df5b94079a95a29353d561e9f.r2.dev/Ref%20Fees%202026-2027.png" 
+               alt="Referee Fee Schedule 2026:2027" 
                className="w-full rounded-lg border border-white/10 shadow-2xl cursor-zoom-in group"
-               onClick={() => setSelectedImg("https://images.pacificregionalsoccer.com/REFEREE%20SCHEDULE.avif")}
+               onClick={() => setSelectedImg("https://pub-1641cc9df5b94079a95a29353d561e9f.r2.dev/Ref%20Fees%202026-2027.png")}
              />
           </section>
 
