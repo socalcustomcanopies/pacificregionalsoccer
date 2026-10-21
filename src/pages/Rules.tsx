@@ -579,10 +579,10 @@ export default function Rules() {
           <section id="ref-fees" className="glass-panel p-8 lg:p-12 border border-white/10 bg-[#0f0f0f]/95 scroll-mt-36">
              <h2 className="text-2xl font-black uppercase mb-8 flex items-center gap-3"><CreditCard className="text-[#C8102E]" /> Referee Fee Schedule</h2>
              <img 
-               src="https://pub-1641cc9df5b94079a95a29353d561e9f.r2.dev/Ref%20Fees%202026-2027.png" 
-               alt="Referee Fee Schedule 2026:2027" 
+               src="https://pub-1641cc9df5b94079a95a29353d561e9f.r2.dev/PRSL2026Fallreffeeschedule.png" 
+               alt="PRSL 2026 Fall Referee Fee Schedule" 
                className="w-full rounded-lg border border-white/10 shadow-2xl cursor-zoom-in group"
-               onClick={() => setSelectedImg("https://pub-1641cc9df5b94079a95a29353d561e9f.r2.dev/Ref%20Fees%202026-2027.png")}
+               onClick={() => setSelectedImg("https://pub-1641cc9df5b94079a95a29353d561e9f.r2.dev/PRSL2026Fallreffeeschedule.png")}
              />
           </section>
 
