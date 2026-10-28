@@ -298,7 +298,7 @@ export default function SoCalCustomCanopies() {
       href: '/#events',
       icon: Calendar,
       dropdown: [
-        { name: 'Fall League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
+        { name: 'Spring League 2027', href: 'https://soccer.sincsports.com/register/start.aspx?tid=DSPCH&tab=2&sub=0' },
         { name: 'Scrimmage Request', href: 'https://www.Socalsoccerscrimmages.com' },
         { name: 'Tournaments', href: '/tournaments' }
       ]

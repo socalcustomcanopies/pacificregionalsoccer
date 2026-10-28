@@ -89,7 +89,7 @@ export default function Home() {
       { name: 'Fall Schedule', href: 'https://soccer.sincsports.com/schedule.aspx?tid=PACRSL&tab=3&sub=0', highlight: true },
     ]},
     { name: 'Events', href: '/#events', icon: Calendar, dropdown: [
-      { name: 'Fall League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
+      { name: 'Spring League 2027', href: 'https://soccer.sincsports.com/register/start.aspx?tid=DSPCH&tab=2&sub=0' },
       { name: 'Scrimmage Request', href: 'https://www.Socalsoccerscrimmages.com' },
       { name: 'Tournaments', href: '/tournaments' }
     ]},
@@ -454,9 +454,9 @@ export default function Home() {
         </div>
 
         <div className="max-w-xl mx-auto">
-           {/* Fall */}
+           {/* Spring */}
            <motion.div 
-             id="fall-event"
+             id="spring-event"
              variants={revealVariants}
              initial="hidden"
              whileInView="visible"
@@ -465,16 +465,16 @@ export default function Home() {
            >
               <div className="w-full flex-1 flex flex-col">
                 <div className="min-h-[120px] flex flex-col justify-center">
-                  <h3 className="text-[#C8102E] text-3xl font-black mb-2 uppercase">Fall League 2026</h3>
-                  <p className="font-bold text-lg text-[#111] mb-6">Now accepting applications.</p>
+                  <h3 className="text-[#C8102E] text-3xl font-black mb-2 uppercase">Spring League 2027</h3>
+                  <p className="font-bold text-lg text-[#111] mb-6">Now accepting registration.</p>
                 </div>
                 <div className="flex-1 flex items-center justify-center">
-                  <a href="https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0" target="_blank" rel="noreferrer" className="block transform transition-transform hover:scale-[1.02] mb-6">
-                    <img src="https://images.pacificregionalsoccer.com/Fall%20League%202026.png" alt="Fall League" className="rounded-lg shadow-md max-w-full h-auto mx-auto" />
+                  <a href="https://soccer.sincsports.com/register/start.aspx?tid=DSPCH&tab=2&sub=0" target="_blank" rel="noreferrer" className="block transform transition-transform hover:scale-[1.02] mb-6">
+                    <img src="https://images.pacificregionalsoccer.com/SPRING%20LEAGUE%202027.PNG" alt="Spring League 2027" className="rounded-lg shadow-md max-w-full h-auto mx-auto" />
                   </a>
                 </div>
               </div>
-              <a href="https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0" target="_blank" rel="noreferrer" className="btn-primary bg-gradient-to-br from-red-600 to-red-800 shadow-red-200/50 btn-pulse-fall w-fit">
+              <a href="https://soccer.sincsports.com/register/start.aspx?tid=DSPCH&tab=2&sub=0" target="_blank" rel="noreferrer" className="btn-primary bg-gradient-to-br from-red-600 to-red-800 shadow-red-200/50 btn-pulse-fall w-fit">
                 Register Now
               </a>
            </motion.div>

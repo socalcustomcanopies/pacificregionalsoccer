@@ -65,7 +65,7 @@ export default function Rules() {
       { name: 'Fall Schedule', href: 'https://soccer.sincsports.com/schedule.aspx?tid=PACRSL&tab=3&sub=0', highlight: true },
     ]},
     { name: 'Events', href: '/#events', dropdown: [
-      { name: 'Fall League', href: 'https://soccer.sincsports.com/register/start.aspx?tid=PACRSL&tab=2&sub=0' },
+      { name: 'Spring League 2027', href: 'https://soccer.sincsports.com/register/start.aspx?tid=DSPCH&tab=2&sub=0' },
       { name: 'Scrimmage Request', href: 'https://www.Socalsoccerscrimmages.com' },
       { name: 'Tournaments', href: '/tournaments' }
     ]},
